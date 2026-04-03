@@ -1758,6 +1758,12 @@ function doSearch(q) {
   searchQ = q.toLowerCase().trim();
   render();
 }
+function toggleSearch() {
+  const inp = document.getElementById('search-input');
+  inp.classList.toggle('open');
+  if (inp.classList.contains('open')) inp.focus();
+  else { inp.value = ''; doSearch(''); }
+}
 
 /* ══ INIT ═══════════════════════════ */
 load();

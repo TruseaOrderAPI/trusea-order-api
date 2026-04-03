@@ -193,28 +193,46 @@ header {
 .search-wrap {
   margin-left: auto;
   position: relative;
+  display: flex;
+  align-items: center;
 }
 
-.search-ico {
-  position: absolute;
-  left: 11px; top: 50%;
-  transform: translateY(-50%);
-  color: var(--text3);
-  pointer-events: none;
-  font-size: 14px;
-}
-
-.search {
+.search-toggle {
+  width: 36px; height: 36px;
   background: #fff;
   border: 1.5px solid var(--border);
   border-radius: 100px;
-  padding: 7px 16px 7px 34px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.search-toggle:hover { background: var(--teal-lt); border-color: var(--teal); }
+
+.search {
+  width: 0;
+  opacity: 0;
+  padding: 0;
+  border: none;
+  pointer-events: none;
+  transition: all 0.25s ease;
+  border-radius: 100px;
   font-family: 'Nunito Sans', sans-serif;
   font-size: 13px;
   color: var(--text);
-  width: 140px;
+  background: #fff;
   outline: none;
-  transition: border-color 0.16s;
+}
+
+.search.open {
+  width: 160px;
+  opacity: 1;
+  padding: 7px 14px;
+  border: 1.5px solid var(--border);
+  pointer-events: auto;
+  margin-right: 6px;
 }
 
 .search:focus { border-color: var(--teal); }
@@ -1028,9 +1046,9 @@ header {
   <button class="pill" onclick="setFilter('in',this)">✓ In Stock</button>
   <button class="pill" onclick="setFilter('out',this)">📋 Pre-Book</button>
   <div class="search-wrap">
-    <span class="search-ico">🔍</span>
-    <input class="search" type="text" placeholder="Search fish…" oninput="doSearch(this.value)">
-  </div>
+  <input class="search" id="search-input" type="text" 
+    placeholder="Search fish…" oninput="doSearch(this.value)">
+  <div class="search-toggle" onclick="toggleSearch()">🔍</div>
 </div>
 
 <!-- ════════════ CATALOG ════════════ -->

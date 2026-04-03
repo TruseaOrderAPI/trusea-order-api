@@ -25,8 +25,8 @@
   --text3:      #7ba896;
   --in-c:       #166534;
   --in-bg:      #dcfce7;
-  --out-c:      #991b1b;
-  --out-bg:     #fee2e2;
+  --out-c:      #1e4fa3;
+  --out-bg:     #e8effe;
   --shadow:     0 2px 12px rgba(11,51,38,0.07);
   --shadow-lg:  0 10px 40px rgba(11,51,38,0.13);
   --r:          16px;
@@ -67,7 +67,7 @@ header {
 
 .logo-img {
   height: 56px;
-   max-width: 180px;
+  max-width: 180px;
   object-fit: contain;
   display: block;
 }
@@ -275,7 +275,7 @@ header {
   to   { opacity:1; transform:translateY(0); }
 }
 
-.card.oos { opacity: 0.58; }
+.card.oos { opacity: 1; }
 
 /* Image */
 .card-img-wrap {
@@ -597,6 +597,8 @@ header {
 }
 
 .add-btn:hover { background: var(--accent-h); transform: scale(1.03); }
+.add-btn.prebook-btn { background: var(--out-c); }
+.add-btn.prebook-btn:hover { background: #1a3f8a; }
 .add-btn:disabled { background: #c8d8d0; cursor: not-allowed; transform: none; }
 
 .qty-ctrl {
@@ -882,7 +884,74 @@ header {
 
 .wa-icon { width: 20px; height: 20px; fill: #fff; flex-shrink: 0; }
 
-/* Config notice */
+.addr-field {
+  width: 100%;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 13px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 13.5px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+  resize: none;
+  margin-top: 8px;
+}
+
+.addr-field:focus { border-color: var(--teal); }
+.addr-field::placeholder { color: var(--text3); }
+
+.map-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  align-items: center;
+}
+
+.map-input {
+  flex: 1;
+  background: #fff;
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 13px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.map-input:focus { border-color: var(--teal); }
+.map-input::placeholder { color: var(--text3); }
+
+.loc-btn {
+  background: var(--teal-lt);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 9px 13px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 12.5px;
+  font-weight: 700;
+  color: var(--teal);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.16s;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.loc-btn:hover { background: var(--teal); color: #fff; border-color: var(--teal); }
+
+.submit-status {
+  margin-top: 8px;
+  font-size: 12px;
+  text-align: center;
+  min-height: 18px;
+  color: var(--teal);
+  font-weight: 600;
+}
 .cfg-notice {
   max-width: 1120px;
   margin: 16px auto 0;
@@ -923,7 +992,7 @@ header {
     <div class="logo-wrap">
       <img
         class="logo-img"
-        src="https://drive.google.com/thumbnail?id=1Yky4_vaRsUxjokSnQCWxASgCHDN0QkgO&sz=h120"
+        src="https://drive.google.com/thumbnail?id=1nHRQLGqlVNKxgRXijTp-qW5gmblEEzZa&sz=h120"
         alt="TruSea Fish"
         onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block'"
       >
@@ -957,7 +1026,7 @@ header {
 <div class="controls">
   <button class="pill on" onclick="setFilter('all',this)">All</button>
   <button class="pill" onclick="setFilter('in',this)">✓ In Stock</button>
-  <button class="pill" onclick="setFilter('out',this)">✗ Out of Stock</button>
+  <button class="pill" onclick="setFilter('out',this)">📋 Pre-Book</button>
   <div class="search-wrap">
     <span class="search-ico">🔍</span>
     <input class="search" type="text" placeholder="Search fish…" oninput="doSearch(this.value)">
@@ -995,6 +1064,12 @@ header {
       <input class="field" id="cust-name" type="text" placeholder="Your name">
       <input class="field" id="cust-phone" type="tel" placeholder="Phone number">
     </div>
+    <textarea class="addr-field" id="cust-address" rows="2" placeholder="Delivery address"></textarea>
+    <div class="map-row">
+      <input class="map-input" id="cust-maploc" type="text" placeholder="Map link (auto-filled or paste)">
+      <button class="loc-btn" onclick="getLocation()">📍 Get Location</button>
+    </div>
+    <div class="submit-status" id="submit-status"></div>
   </div>
   <div class="drawer-foot">
     <div class="total-row">
@@ -1011,34 +1086,28 @@ header {
 <!-- ════════════ SCRIPT ════════════ -->
 <script>
 /* ══════════════════════════════════════
-   ⚙️ CONFIG — Edit these two values
+   ⚙️ CONFIG — Edit these values
 ══════════════════════════════════════
-   SHEET_ID : From your Google Sheet URL
-     https://docs.google.com/spreadsheets/d/THIS_PART/edit
-   WA_NUMBER: Your WhatsApp number with country code
-     e.g. 919876543210
+   SHEET_ID        : From your Google Sheet URL
+   WA_NUMBER       : WhatsApp number with country code
+   APPS_SCRIPT_URL : Deploy URL from Google Apps Script
+                     (for writing orders to Sheet2)
 
-   SHEET COLUMNS EXPECTED:
-   A: Product Name
-   B: Type          (Fish / Prawns / Crab / etc.)
-   C: Category      (Big Fish / Small Fish / Other)
-   D: Variant       (Large Slices / Medium Slices / etc.)
-   E: Price         (number)
-   F: Pieces        (e.g. "6-8")
-   G: Gross         (e.g. "600g")
-   H: Net           (e.g. "420g")
-   I: Serves        (e.g. "3-4")
-   J: Cut Size      (e.g. "1 inch")
-   K: Stock         (In Stock / Out of Stock)
-   L: Image URL
-   M: Addon Price   (Head & Tail cost, 0 = hide)
-   N: Extra Price Per Piece
-   O: Ideal For     (e.g. "Curry & Fry")
+   SHEET1 COLUMNS (product catalog):
+   A: Product Name  B: Type  C: Category  D: Variant
+   E: Price  F: Pieces  G: Gross  H: Net
+   I: Serves  J: Cut Size  K: Stock
+   L: Image URL  M: Addon Price  N: Extra PPP  O: Ideal For
+
+   SHEET2 COLUMNS (order log — auto-created by Apps Script):
+   Timestamp | Name | Phone | Address | Map Link |
+   Product | Variant | Add-ons | Qty | Price | Pre-Book | Total
 ══════════════════════════════════════ */
 const CONFIG = {
-  SHEET_ID:      '1LdJAHcoYX8ruxVEKG5j-X1KyaZohOLfhyYaUBmsVoyI',
-  WA_NUMBER:     '919003346276',
-  SHEET_TAB:     'Sheet1',
+  SHEET_ID:         '1LdJAHcoYX8ruxVEKG5j-X1KyaZohOLfhyYaUBmsVoyI',
+  WA_NUMBER:        '919003346276',
+  SHEET_TAB:        'Sheet1',
+  APPS_SCRIPT_URL:  'https://script.google.com/macros/s/AKfycbz2m9iqzso2uzElLIXu52mw-SnZqQ9O1i0TxjEGKCpvhPlbiDWAOh7vD33yaCws7pgANA/exec',  // ← paste after deploy
 };
 
 /* ══ STATE ══════════════════════════ */
@@ -1237,7 +1306,7 @@ function cardHTML(g, gi) {
       ${imgHTML}
       <div class="card-img-placeholder" ${g.imageUrl?'style="display:none"':''}">🐟</div>
       <span class="stock-tag ${firstW.inStock?'in':'out'}" id="${cardId}_stag">
-        ${firstW.inStock?'✓ In Stock':'✗ Sold Out'}
+      ${firstW.inStock?'✓ In Stock':'📋 Pre-Book'}
       </span>
     </div>
 
@@ -1279,10 +1348,9 @@ function cardHTML(g, gi) {
           <div class="qc-val" id="${cardId}_qval">1</div>
           <button class="qc-btn" onclick="changeQty('${cardId}',1)">+</button>
         </div>
-        <button class="add-btn" id="${cardId}_addbtn"
-          onclick="addToCart('${cardId}')"
-          ${allOOS?'disabled':''}>
-          ${allOOS?'Sold Out':'Add'}
+        <button class="add-btn ${allOOS?'prebook-btn':''}" id="${cardId}_addbtn"
+          onclick="addToCart('${cardId}')">
+          ${allOOS?'📋 Pre-Book':'Add'}
         </button>
       </div>
     </div>
@@ -1320,15 +1388,20 @@ function selectVariant(cardId, wi) {
   const tag = document.getElementById(cardId + '_stag');
   if (tag) {
     tag.className = 'stock-tag ' + (w.inStock ? 'in' : 'out');
-    tag.textContent = w.inStock ? '✓ In Stock' : '✗ Sold Out';
+    tag.textContent = w.inStock ? '✓ In Stock' : '📋 Pre-Book';
   }
 
   // Update add button
   const btn = document.getElementById(cardId + '_addbtn');
   if (btn) {
-    btn.disabled = !w.inStock;
-    if (!w.inStock) btn.textContent = 'Sold Out';
-    else if (!btn.classList.contains('added')) btn.textContent = 'Add';
+    btn.disabled = false;
+    if (!w.inStock) {
+      btn.textContent = '📋 Pre-Book';
+      btn.classList.add('prebook-btn');
+    } else if (!btn.classList.contains('added')) {
+      btn.textContent = 'Add';
+      btn.classList.remove('prebook-btn');
+    }
   }
 
   // Update card oos class
@@ -1415,7 +1488,7 @@ function addToCart(cardId) {
   if (!g) return;
   const wi = selVariant[cardId] || 0;
   const w  = g.weights[wi];
-  if (!w.inStock) return;
+  const isPreBook = !w.inStock;
 
   const addonCb  = document.getElementById(cardId + '_addon');
   const extraCb  = document.getElementById(cardId + '_extra');
@@ -1441,6 +1514,7 @@ function addToCart(cardId) {
       label, details: details.join(', '),
       qty: 1, unitPrice: basePrice,
       addonOn, extraOn, extraQty,
+      preBook: isPreBook,
     };
   }
 
@@ -1515,7 +1589,7 @@ function renderDrawer() {
     return `
       <div class="order-item">
         <div class="oi-info">
-          <div class="oi-name">${item.label}</div>
+          <div class="oi-name">${item.preBook ? '📋 ' : ''}${item.label}${item.preBook ? ' <span style="background:#e8effe;color:#1e4fa3;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;letter-spacing:0.3px">PRE-BOOK</span>' : ''}</div>
           <div class="oi-detail">
             Qty: ${item.qty} × ₹${item.unitPrice}
             ${item.details ? '<br>' + item.details : ''}
@@ -1531,35 +1605,127 @@ function renderDrawer() {
     '₹' + grandTotal.toLocaleString('en-IN');
 }
 
-/* ══ WHATSAPP ═══════════════════════ */
-function sendWA() {
+/* ══ GEOLOCATION ════════════════════ */
+function getLocation() {
+  const btn = document.querySelector('.loc-btn');
+  btn.textContent = '📍 Getting…';
+  btn.disabled = true;
+  if (!navigator.geolocation) {
+    alert('Geolocation not supported on this browser.');
+    btn.textContent = '📍 Get Location'; btn.disabled = false; return;
+  }
+  navigator.geolocation.getCurrentPosition(
+    pos => {
+      const lat = pos.coords.latitude.toFixed(6);
+      const lng = pos.coords.longitude.toFixed(6);
+      const mapsUrl = `https://maps.google.com/?q=${lat},${lng}`;
+      document.getElementById('cust-maploc').value = mapsUrl;
+      btn.textContent = '✅ Got It'; btn.disabled = false;
+    },
+    err => {
+      alert('Could not get location. Please paste your Google Maps link manually.');
+      btn.textContent = '📍 Get Location'; btn.disabled = false;
+    },
+    { timeout: 10000 }
+  );
+}
+
+/* ══ WHATSAPP + SHEET LOG ═══════════ */
+async function sendWA() {
   const items = Object.entries(cart);
   if (!items.length) { alert('Please add items to your order first!'); return; }
-  const name  = document.getElementById('cust-name').value.trim();
-  const phone = document.getElementById('cust-phone').value.trim();
-  if (!name) { document.getElementById('cust-name').focus(); alert('Please enter your name'); return; }
+
+  const name    = document.getElementById('cust-name').value.trim();
+  const phone   = document.getElementById('cust-phone').value.trim();
+  const address = document.getElementById('cust-address').value.trim();
+  const mapLoc  = document.getElementById('cust-maploc').value.trim();
+
+  if (!name)    { document.getElementById('cust-name').focus(); alert('Please enter your name'); return; }
+  if (!phone)   { document.getElementById('cust-phone').focus(); alert('Please enter your phone number'); return; }
+  if (!address) { document.getElementById('cust-address').focus(); alert('Please enter your delivery address'); return; }
 
   const date = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
   let grandTotal = 0;
-  let lines = '';
+  let waLines = '';
 
   items.forEach(([, item]) => {
     const lt = item.qty * item.unitPrice;
     grandTotal += lt;
-    lines += `• ${item.label}\n`;
-    lines += `  Qty: ${item.qty} × ₹${item.unitPrice} = *₹${lt.toLocaleString('en-IN')}*\n`;
-    if (item.details) lines += `  (${item.details})\n`;
+    waLines += `• ${item.preBook ? '[PRE-BOOK] ' : ''}${item.label}\n`;
+    waLines += `  Qty: ${item.qty} × ₹${item.unitPrice} = *₹${lt.toLocaleString('en-IN')}*\n`;
+    if (item.details) waLines += `  Add-ons: ${item.details}\n`;
   });
 
-  let msg = `🐟 *TruSea Fish — Fresh Order*\n`;
+  // WhatsApp message
+  let msg = `🐟 *TruSea Fish — ${items.some(([,i])=>i.preBook) ? 'Order + Pre-Book' : 'Fresh Order'}*\n`;
   msg += `📅 ${date}\n`;
-  msg += `👤 *${name}*${phone?' | '+phone:''}\n\n`;
-  msg += `*Order Summary:*\n${lines}\n`;
+  msg += `👤 *${name}* | ${phone}\n`;
+  msg += `📍 ${address}\n`;
+  if (mapLoc) msg += `🗺️ ${mapLoc}\n`;
+  msg += `\n*Order Summary:*\n${waLines}\n`;
   msg += `💰 *Total: ₹${grandTotal.toLocaleString('en-IN')}*\n`;
   msg += `_(Incl. GST & Free Delivery)_\n\n`;
   msg += `_Sent via TruSea Fresh Order Page_`;
 
+  // Open WhatsApp
   window.open(`https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+
+  // Log to Sheet2
+  logToSheet({ name, phone, address, mapLoc, items, grandTotal });
+}
+
+async function logToSheet({ name, phone, address, mapLoc, items, grandTotal }) {
+  if (CONFIG.APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+
+  const status = document.getElementById('submit-status');
+  status.textContent = '⏳ Saving order…';
+  status.style.color = 'var(--text3)';
+
+  const timestamp = new Date().toLocaleString('en-IN');
+  const rows = [];
+
+  Object.values(items).forEach(([, item]) => {
+    rows.push({
+      timestamp,
+      name, phone, address,
+      mapLink:  mapLoc || '',
+      product:  item.label,
+      variant:  item.label.split('(')[1]?.replace(')','').trim() || '',
+      addons:   item.details || '',
+      qty:      item.qty,
+      price:    item.unitPrice,
+      preBook:  item.preBook ? 'Yes' : 'No',
+      total:    item.qty * item.unitPrice,
+    });
+  });
+
+  // Fix: items is Object.entries array
+  const orderRows = Object.entries(cart).map(([, item]) => ({
+    timestamp,
+    name, phone, address,
+    mapLink:  mapLoc || '',
+    product:  item.label,
+    addons:   item.details || '',
+    qty:      item.qty,
+    price:    item.unitPrice,
+    preBook:  item.preBook ? 'Yes' : 'No',
+    total:    item.qty * item.unitPrice,
+    grandTotal,
+  }));
+
+  try {
+    await fetch(CONFIG.APPS_SCRIPT_URL, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orders: orderRows }),
+    });
+    status.textContent = '✅ Order saved to records!';
+    status.style.color = 'var(--teal)';
+  } catch(e) {
+    status.textContent = '⚠️ Could not save to sheet (order still sent via WA)';
+    status.style.color = '#b45309';
+  }
 }
 
 /* ══ FILTER & SEARCH ════════════════ */

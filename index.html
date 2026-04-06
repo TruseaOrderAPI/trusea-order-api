@@ -811,7 +811,7 @@ const CONFIG = {
   SHEET_ID:         '1LdJAHcoYX8ruxVEKG5j-X1KyaZohOLfhyYaUBmsVoyI',
   WA_NUMBER:        '919003346276',
   SHEET_TAB:        'Sheet1',
-  APPS_SCRIPT_URL:  'https://script.google.com/macros/s/AKfycbz2m9iqzso2uzElLIXu52mw-SnZqQ9O1i0TxjEGKCpvhPlbiDWAOh7vD33yaCws7pgANA/exec',  // ← paste after deploy
+  APPS_SCRIPT_URL:  'https://script.google.com/macros/s/AKfycbyNCcH4Q-FJHaj7F5b5wbMJ2LpJSIjiG_MhZioXMlZ0_Wtk0yIKZ3USL2FpIPkzRZpqzQ/exec',  // ← paste after deploy
 };
 
 /* ══ STATE ══════════════════════════ */
@@ -1438,7 +1438,7 @@ async function sendWA() {
 }
 
 async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal }) {
-  if (CONFIG.APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
+  if (CONFIG.APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyNCcH4Q-FJHaj7F5b5wbMJ2LpJSIjiG_MhZioXMlZ0_Wtk0yIKZ3USL2FpIPkzRZpqzQ/exec') return;
 
   const status = document.getElementById('submit-status');
   status.textContent = '⏳ Saving order…';

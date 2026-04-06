@@ -1438,7 +1438,7 @@ async function sendWA() {
 }
 
 async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal }) {
-  if (CONFIG.APPS_SCRIPT_URL === 'https://script.google.com/macros/s/AKfycbyNCcH4Q-FJHaj7F5b5wbMJ2LpJSIjiG_MhZioXMlZ0_Wtk0yIKZ3USL2FpIPkzRZpqzQ/exec') return;
+  if (CONFIG.APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
 
   const status = document.getElementById('submit-status');
   status.textContent = '⏳ Saving order…';

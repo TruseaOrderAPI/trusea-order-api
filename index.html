@@ -1287,25 +1287,40 @@ function renderDrawer() {
     return;
   }
 
+  // Only in-stock items contribute to paid total
   let grandTotal = 0;
 
   body.innerHTML = items.map(([key, item]) => {
-    const lineTotal = item.qty * item.unitPrice;
-    grandTotal += lineTotal;
     const baseP = item.basePrice || item.unitPrice;
-    return `
-      <div class="order-item">
-        <div class="oi-info">
-          <div class="oi-name">${item.preBook ? '📋 ' : ''}${item.label}${item.preBook ? ' <span style="background:#e8effe;color:#1e4fa3;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;letter-spacing:0.3px">PRE-BOOK</span>' : ''}</div>
-          <div class="oi-detail">
-            Qty: ${item.qty} × ₹${baseP}
-            ${item.details ? '<br>Add-ons: ' + item.details : ''}
+    if (item.preBook) {
+      // Pre-book — show name + PRE-BOOK tag, no price charged
+      return `
+        <div class="order-item">
+          <div class="oi-info">
+            <div class="oi-name">📋 ${item.label} <span style="background:rgba(96,165,250,0.15);color:#60a5fa;font-size:10px;font-weight:700;padding:2px 7px;border-radius:100px;letter-spacing:0.3px">PRE-BOOK</span></div>
+            <div class="oi-detail">Qty: ${item.qty} · Price collected on delivery</div>
           </div>
+          <div class="oi-price" style="color:var(--text3);font-size:12px;">Pre-Book</div>
+          <button class="rm-btn" onclick="removeFromCart('${key}')">✕</button>
         </div>
-        <div class="oi-price">₹${lineTotal.toLocaleString('en-IN')}</div>
-        <button class="rm-btn" onclick="removeFromCart('${key}')">✕</button>
-      </div>
-    `;
+      `;
+    } else {
+      const lineTotal = item.qty * item.unitPrice;
+      grandTotal += lineTotal;
+      return `
+        <div class="order-item">
+          <div class="oi-info">
+            <div class="oi-name">${item.label}</div>
+            <div class="oi-detail">
+              Qty: ${item.qty} × ₹${baseP}
+              ${item.details ? '<br>Add-ons: ' + item.details : ''}
+            </div>
+          </div>
+          <div class="oi-price">₹${lineTotal.toLocaleString('en-IN')}</div>
+          <button class="rm-btn" onclick="removeFromCart('${key}')">✕</button>
+        </div>
+      `;
+    }
   }).join('');
 
   document.getElementById('total-val').textContent =
@@ -1377,37 +1392,52 @@ async function sendWA() {
 
   saveProfile();
 
-  const orderId = genOrderId();
-  const date    = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
-  let grandTotal = 0;
-  let waLines    = '';
+  const orderId  = genOrderId();
+  const date     = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
 
-  items.forEach(([, item]) => {
-    const basePrice = item.basePrice || item.unitPrice;
-    const lt        = item.qty * item.unitPrice;
-    grandTotal     += lt;
-    waLines += `• ${item.preBook ? '[PRE-BOOK] ' : ''}${item.label}\n`;
-    waLines += `  Qty: ${item.qty} × ₹${basePrice}\n`;
+  // Separate in-stock and pre-book items
+  const inStockItems  = items.filter(([, i]) => !i.preBook);
+  const preBookItems  = items.filter(([, i]) =>  i.preBook);
+
+  // Grand total — only in-stock items
+  let grandTotal = 0;
+  let waLines = '';
+
+  inStockItems.forEach(([, item]) => {
+    const baseP  = item.basePrice || item.unitPrice;
+    const lt     = item.qty * item.unitPrice;
+    grandTotal  += lt;
+    waLines += `• ${item.label}\n`;
+    waLines += `  Qty: ${item.qty} × ₹${baseP}\n`;
     if (item.details) waLines += `  Add-ons: ${item.details}\n`;
     waLines += `  Sub-total: *₹${lt.toLocaleString('en-IN')}*\n`;
   });
 
-  let msg  = `🐟 *TruSea Fish — ${items.some(([,i])=>i.preBook) ? 'Order + Pre-Book' : 'Fresh Order'}*\n`;
+  if (preBookItems.length) {
+    waLines += `\n📋 *Pre-Book Items (price on delivery):*\n`;
+    preBookItems.forEach(([, item]) => {
+      waLines += `• ${item.label} — Qty: ${item.qty}\n`;
+    });
+  }
+
+  const hasPreBook = preBookItems.length > 0;
+  let msg  = `🐟 *TruSea Fish — ${hasPreBook ? 'Order + Pre-Book' : 'Fresh Order'}*\n`;
   msg     += `🆔 Order ID: *${orderId}*\n`;
   msg     += `📅 ${date}\n`;
   msg     += `👤 *${name}* | ${phone}\n`;
   msg     += `📍 ${address}\n`;
   if (mapLoc) msg += `🗺️ ${mapLoc}\n`;
   msg     += `\n*Order Summary:*\n${waLines}\n`;
-  msg     += `💰 *Total: ₹${grandTotal.toLocaleString('en-IN')}*\n`;
-  msg     += `_(Incl. GST & Free Delivery)_\n\n`;
-  msg     += `_Sent via TruSea Fresh · ${orderId}_`;
+  msg     += `💰 *Order Total: ₹${grandTotal.toLocaleString('en-IN')}*\n`;
+  msg     += `_(Incl. GST & Free Delivery)_\n`;
+  if (hasPreBook) msg += `_Pre-book items will be charged on delivery_\n`;
+  msg     += `\n_Sent via TruSea Fresh · ${orderId}_`;
 
   window.open(`https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-  logToSheet({ orderId, name, phone, address, mapLoc, items, grandTotal });
+  logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal });
 }
 
-async function logToSheet({ orderId, name, phone, address, mapLoc, items, grandTotal }) {
+async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal }) {
   if (CONFIG.APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
 
   const status = document.getElementById('submit-status');
@@ -1416,26 +1446,37 @@ async function logToSheet({ orderId, name, phone, address, mapLoc, items, grandT
 
   const timestamp = new Date().toLocaleString('en-IN');
 
-  const orderRows = Object.entries(cart).map(([, item]) => ({
+  // Build single row per order
+  const inStockNames  = inStockItems.map(([, i]) => i.label).join(' | ');
+  const addonsAll     = inStockItems.map(([, i]) => i.details).filter(Boolean).join(' | ');
+  const preBookNames  = preBookItems.map(([, i]) => i.label).join(' | ');
+
+  // Price = sum of (qty × unitPrice) for in-stock items — not totalled as one number
+  // Per spec: show product price + addon price, not summed
+  const priceBreakdown = inStockItems.map(([, i]) => {
+    const baseP = i.basePrice || i.unitPrice;
+    const addonAmt = i.unitPrice - baseP;
+    return `₹${baseP}${addonAmt > 0 ? '+₹'+addonAmt : ''}`;
+  }).join(' | ');
+
+  const orderRow = {
     timestamp,
-    orderId:  orderId || '',
+    orderId,
     name, phone, address,
-    mapLink:  mapLoc || '',
-    product:  item.label,
-    addons:   item.details || '',
-    qty:      item.qty,
-    price:    item.basePrice || item.unitPrice,
-    preBook:  item.preBook ? 'Yes' : 'No',
-    total:    item.qty * item.unitPrice,
-    grandTotal,
-  }));
+    mapLink:    mapLoc || '',
+    product:    inStockNames,
+    addons:     addonsAll || '',
+    preBook:    preBookNames || '',
+    price:      priceBreakdown,
+    orderTotal: grandTotal,
+  };
 
   try {
     await fetch(CONFIG.APPS_SCRIPT_URL, {
       method: 'POST',
       mode: 'no-cors',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ orders: orderRows }),
+      body: JSON.stringify({ orders: [orderRow] }),
     });
     status.textContent = `✅ Order ${orderId} saved!`;
     status.style.color = 'var(--teal)';

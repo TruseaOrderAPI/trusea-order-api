@@ -318,7 +318,7 @@ header {
 
 .variant-section { margin-top: 12px; }
 .variant-label-row { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text2); font-weight: 700; margin-bottom: 7px; }
-.variant-buttons { display: flex; flex-wrap: wrap; gap: 8px; }
+.variant-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 6px; }
 
 .var-btn {
   background: var(--glass);
@@ -333,6 +333,7 @@ header {
   transition: all 0.15s;
   line-height: 1.4;
   text-align: center;
+  justify-content: center;
 }
 
 .var-btn:hover { background: var(--glass-hover); color: var(--text); border-color: var(--teal); }

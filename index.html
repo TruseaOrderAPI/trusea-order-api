@@ -869,6 +869,7 @@ function parseCSV(csv) {
       addonPrice: parseFloat(clean(c[12])) || 0,
       extraPPP:   parseFloat(clean(c[13])) || 0,
       idealFor:   clean(c[14]),
+      sizeVariant: clean(c[15]),      // 500g / 1kg
     });
   }
   return out;
@@ -903,6 +904,7 @@ function groupProducts(rows) {
       cutSize: r.cutSize,
       price:   r.price,
       inStock: r.inStock,
+      sizeVariant: r.sizeVariant,
     });
   });
   return Array.from(map.values());
@@ -955,15 +957,14 @@ function cardHTML(g, gi) {
 
   // Weight variant buttons
   const varButtons = g.weights.map((w, wi) => `
-    <button
-      class="var-btn ${wi===0?'sel':''} ${!w.inStock?'oos-v':''}"
-      onclick="selectVariant('${cardId}',${wi})"
-      ${!w.inStock?'title="Out of Stock"':''}
-    >
-      Gross: ${w.gross}
-      <small>Net: ${w.net}</small>
-    </button>
-  `).join('');
+  <button
+    class="var-btn ${wi===0?'sel':''} ${!w.inStock?'oos-v':''}"
+    onclick="selectVariant('${cardId}',${wi})"
+    ${!w.inStock?'title="Out of Stock"':''}
+  >
+    ${w.sizeVariant || 'Standard'}
+  </button>
+`).join('');
 
   // Addon row (Head & Tail) — only for Fish type
   const addonRow = isFish && g.addonPrice > 0 ? `

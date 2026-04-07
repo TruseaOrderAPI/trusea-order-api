@@ -27,6 +27,36 @@
   --r: 18px;
 }
 
+.catalog-end {
+  grid-column: 1 / -1;
+  text-align: center;
+  margin-top: 20px;
+  padding: 30px 10px 10px;
+  color: var(--text3);
+  font-size: 13px;
+}
+
+.scroll-top-btn {
+  margin-top: 12px;
+  padding: 10px 18px;
+  border-radius: 100px;
+  border: 0.5px solid var(--glass-border);
+  background: var(--glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.scroll-top-btn:hover {
+  background: var(--glass-hover);
+  color: var(--teal);
+  transform: translateY(-2px);
+}
+
 * { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior:smooth; }
 
@@ -909,6 +939,13 @@ function groupProducts(rows) {
   });
   return Array.from(map.values());
 }
+  
+  function scrollToTop() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
 
 function splitLine(line) {
   const result = []; let cur = ''; let inQ = false;
@@ -945,7 +982,14 @@ function render() {
     return;
   }
 
-  cat.innerHTML = list.map((g, gi) => cardHTML(g, gi)).join('');
+  cat.innerHTML = 
+  list.map((g, gi) => cardHTML(g, gi)).join('') +
+  `
+  <div class="catalog-end">
+    <p>Catalog complete. You've reached the end.</p>
+    <button class="scroll-top-btn" onclick="scrollToTop()">↑ Back to Top</button>
+  </div>
+  `;
 }
 
 function cardHTML(g, gi) {

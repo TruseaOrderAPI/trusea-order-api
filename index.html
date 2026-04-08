@@ -32,7 +32,7 @@
   text-align: center;
   margin-top: 20px;
   padding: 30px 10px 10px;
-  color: var(--text3);
+  color: var(--text2);
   font-size: 13px;
 }
 
@@ -145,7 +145,7 @@ header {
 
 .hero-eyebrow { font-size: 10.5px; letter-spacing: 3px; text-transform: uppercase; color: var(--teal); font-weight: 600; margin-bottom: 10px; }
 .hero h1 { font-size: clamp(1.7rem,4vw,2.4rem); font-weight: 700; color: var(--text); line-height: 1.15; }
-.hero-sub { margin-top: 8px; font-size: 13px; color: var(--text3); font-weight: 400; }
+.hero-sub { margin-top: 8px; font-size: 13px; color: var(--text2); font-weight: 400; }
 
 /* CONTROLS */
 .controls {
@@ -350,7 +350,7 @@ header {
 
 .price-row { margin-top: 13px; display: flex; align-items: baseline; gap: 6px; }
 .price-main { font-size: 1.5rem; font-weight: 700; color: var(--orange); }
-.price-note { font-size: 11px; color: var(--text3); font-weight: 400; }
+.price-note { font-size: 11px; color: var(--text2); font-weight: 400; }
 
 /* Addon — toggle style */
 .addon-row {
@@ -1092,7 +1092,7 @@ function cardHTML(g, gi) {
       <!-- Price -->
       <div class="price-row">
         <span class="price-main" id="${cardId}_price">₹${firstW.price}</span>
-        <span class="price-note">(Incl. GST &amp; Free Delivery)</span>
+        <span class="price-note">(Incl. GST &amp; FREE delivery)</span>
       </div>
 
       ${addonRow}
@@ -1477,15 +1477,15 @@ async function sendWA() {
   }
 
   const hasPreBook = preBookItems.length > 0;
-  let msg  = `🐟 *TruSea Fish — ${hasPreBook ? 'Order + Pre-Book' : 'Fresh Order'}*\n`;
-  msg     += `🆔 Order ID: *${orderId}*\n`;
-  msg     += `📅 ${date}\n`;
-  msg     += `👤 *${name}* | ${phone}\n`;
-  msg     += `📍 ${address}\n`;
+  let msg  = `*TruSea Fish — ${hasPreBook ? 'Order + Pre-Book' : 'Fresh Order'}*\n`;
+  msg     += `Order ID: *${orderId}*\n`;
+  msg     += `${date}\n`;
+  msg     += `*${name}* | ${phone}\n`;
+  msg     += `${address}\n`;
   if (mapLoc) msg += `🗺️ ${mapLoc}\n`;
   msg     += `\n*Order Summary:*\n${waLines}\n`;
-  msg     += `💰 *Order Total: ₹${grandTotal.toLocaleString('en-IN')}*\n`;
-  msg     += `_(Incl. GST & Free Delivery)_\n`;
+  msg     += `*Order Total: ₹${grandTotal.toLocaleString('en-IN')}*\n`;
+  msg     += `_(Incl. GST & FREE delivery)_\n`;
   if (hasPreBook) msg += `_Pre-book items will be charged on delivery_\n`;
   msg     += `\n_Sent via TruSea Fresh · ${orderId}_`;
 

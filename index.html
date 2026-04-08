@@ -85,13 +85,14 @@ header {
   height: 62px;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: center;
   gap: 16px;
 }
 
 .logo-img { height: 52px; max-width: 180px; object-fit: contain; display: block; }
 .logo-text { font-size: 1.4rem; font-weight: 700; color: var(--text); }
 .logo-text em { font-style: italic; color: var(--teal); }
+.logo-wrap { position: absolute; left: 50%; transform: translateX(-50%); }
 
 .header-meta { display: flex; align-items: center; }
 
@@ -746,14 +747,7 @@ header {
 
 <!-- ════════════ HERO ════════════ -->
 <div class="hero">
-  <div style="display:flex; justify-content:center; margin-bottom:16px;">
-    <img
-      src="https://drive.google.com/thumbnail?id=1ImTxrLAIG76y6DlX9xWJy6xQtxGafaVg&sz=h120"
-      alt="TruSea Fish"
-      style="height:60px; object-fit:contain;"
-      onerror="this.style.display='none'"
-    >
-  </div>
+  
   <div class="hero-eyebrow">🐟 Chennai's Freshest Seafood</div>
   <h1>Daily Fresh Catch<br>Straight to Your Door</h1>
   <p class="hero-sub">Sourced daily · Cleaned & packed · Free delivery</p>

@@ -438,6 +438,8 @@ header {
   font-weight: 700;
   cursor: pointer;
   transition: all 0.18s;
+  min-width: 110px;
+  text-align: center;
 }
 
 .add-btn:hover { background: #22c4a0; transform: scale(1.03); }
@@ -744,6 +746,14 @@ header {
 
 <!-- ════════════ HERO ════════════ -->
 <div class="hero">
+  <div style="display:flex; justify-content:center; margin-bottom:16px;">
+    <img
+      src="https://drive.google.com/thumbnail?id=1ImTxrLAIG76y6DlX9xWJy6xQtxGafaVg&sz=h120"
+      alt="TruSea Fish"
+      style="height:60px; object-fit:contain;"
+      onerror="this.style.display='none'"
+    >
+  </div>
   <div class="hero-eyebrow">🐟 Chennai's Freshest Seafood</div>
   <h1>Daily Fresh Catch<br>Straight to Your Door</h1>
   <p class="hero-sub">Sourced daily · Cleaned & packed · Free delivery</p>
@@ -1089,7 +1099,7 @@ function cardHTML(g, gi) {
       ${extraRow}
       ${idealRow}
 
-      <div class="delivery-row"><strong>Delivery time:</strong> At your convenience</div>
+      <div class="delivery-row"><strong>Delivery time:</strong> ${allOOS ? 'Ships as soon as available' : 'Immediately available'}</div>
 
       <!-- Footer -->
       <div class="card-footer">
@@ -1553,7 +1563,7 @@ function toggleSearch() {
 
 /* ══ INIT ═══════════════════════════ */
 load();
-setInterval(load, 10 * 60 * 1000); // refresh every 10 min
+setInterval(load, 30 * 1000); // refresh every 10 min
 </script>
 </body>
 </html>

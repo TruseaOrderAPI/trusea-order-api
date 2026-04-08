@@ -99,30 +99,17 @@ header {
   transform: translateX(-50%);
 }
 
-.header-meta {
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  margin-top: 6px;
-
 .live-pill {
   display: flex;
   align-items: center;
   gap: 6px;
   background: rgba(11,51,38,0.08);
   border: 1.5px solid rgba(11,51,38,0.15);
-  border-radius: 20px;
-  padding: 4px 10px;
-  font-size: 12px;
+  border-radius: 100px;
+  padding: 5px 13px 5px 10px;
+  font-size: 11.5px;
   color: #0a1729;
   letter-spacing: 0.2px;
-}
-
-@media (min-width: 768px) {
-  .live-pill {
-    font-size: 14px;
-    padding: 6px 14px;
-  }
 }
 
 .pulse {
@@ -752,12 +739,14 @@ header {
         onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block'"
       >
       <div class="logo-text" id="logo-fallback" style="display:none">Tru<em>Sea</em> Fish</div>
+    </div>
     <div class="header-meta">
       <div class="live-pill">
         <div class="pulse"></div>
         <span id="updated-time">Loading stock…</span>
       </div>
     </div>
+  </div>
 </header>
 
 <!-- ════════════ HERO ════════════ -->

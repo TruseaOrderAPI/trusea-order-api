@@ -99,19 +99,24 @@ header {
   transform: translateX(-50%);
 }
 
-.header-meta { display: flex; align-items: center; justify-content: flex-end; flex: 1; }
-
-.live-pill {
+/* Desktop (default) */
+.header-meta {
   display: flex;
-  align-items: center;
-  gap: 6px;
-  background: rgba(11,51,38,0.08);
-  border: 1.5px solid rgba(11,51,38,0.15);
-  border-radius: 100px;
-  padding: 5px 13px 5px 10px;
-  font-size: 11.5px;
-  color: #0a1729;
-  letter-spacing: 0.2px;
+  justify-content: flex-end;
+}
+
+/* Mobile view */
+@media (max-width: 768px) {
+  .header-meta {
+    justify-content: center;   /* center align */
+    width: 100%;
+    margin-top: 6px;
+  }
+
+  .live-pill {
+    font-size: 12px;
+    padding: 4px 10px;
+  }
 }
 
 .pulse {
@@ -756,7 +761,7 @@ header {
   
   <div class="hero-eyebrow">🐟 Chennai's Freshest Seafood</div>
   <h1>Daily Fresh Catch<br>Straight to Your Door</h1>
-  <p class="hero-sub">Sourced daily · Cleaned & packed · Free delivery</p>
+  <p class="hero-sub">Sourced daily · Cleaned & packed · FREE delivery</p>
 </div>
 
 <!-- Config notice -->

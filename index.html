@@ -1465,20 +1465,20 @@ function getLocation() {
   );
 }
 
-/* ══ ORDER ID — Via Apps Script doGet ═══════════ */
+/* ══ ORDER ID — Sequential via Apps Script ═══════════ */
 async function genOrderId() {
   try {
-    const res  = await fetch(CONFIG.APPS_SCRIPT_URL, { redirect: 'follow' });
+    // Apps Script doGet returns { nextId: "TS-0042" }
+    const url = CONFIG.APPS_SCRIPT_URL + '?action=nextId&v=' + Date.now();
+    const res  = await fetch(url);
     if (!res.ok) throw new Error('fetch failed');
     const data = await res.json();
     if (data.nextId) return data.nextId;
-    throw new Error('no nextId in response');
+    throw new Error('no nextId');
   } catch(e) {
+    // Fallback: random 4-digit to avoid blank
     console.warn('genOrderId fallback:', e.message);
-    // Fallback: use current sheet row count approximation via timestamp
-    // Format: TS-T + last 4 digits of epoch seconds (unique enough)
-    const ts = Math.floor(Date.now() / 1000) % 10000;
-    return 'TS-T' + String(ts).padStart(4, '0');
+    return 'TS-' + String(Math.floor(1000 + Math.random() * 9000));
   }
 }
 

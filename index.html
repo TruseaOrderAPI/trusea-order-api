@@ -1268,6 +1268,7 @@ function addToCart(cardId) {
 
   if (cart[key]) {
     cart[key].qty++;
+    syncExtraState(cardId, cart[key].qty);
   } else {
     cart[key] = {
       label, details: details.join(', '),
@@ -1297,14 +1298,71 @@ function changeQty(cardId, delta) {
   cart[key].qty = Math.max(0, cart[key].qty + delta);
   const qval = document.getElementById(cardId + '_qval');
   if (qval) qval.textContent = cart[key].qty;
+
   if (cart[key].qty === 0) {
     delete cart[key];
     const btn = document.getElementById(cardId + '_addbtn');
     const qc  = document.getElementById(cardId + '_qty');
     if (btn) { btn.style.display = ''; btn.textContent = 'Add'; }
     if (qc)  { qc.classList.remove('show'); }
+    // Re-enable extra when removed from cart
+    syncExtraState(cardId, 1);
+  } else {
+    // qty >= 2 → disable extra pieces
+    syncExtraState(cardId, cart[key].qty);
   }
+
   updateFAB();
+}
+
+// Enable/disable extra pieces based on qty
+function syncExtraState(cardId, qty) {
+  const extraCb = document.getElementById(cardId + '_extra');
+  const extraEc = document.getElementById(cardId + '_ec');
+  if (!extraCb) return;
+
+  if (qty >= 2) {
+    // Disable + uncheck + hide counter
+    extraCb.checked  = false;
+    extraCb.disabled = true;
+    if (extraEc) extraEc.classList.remove('show');
+
+    // Update cart item — remove extra from price/details
+    const wi  = selVariant[cardId] || 0;
+    const key = cardId + '_' + wi;
+    if (cart[key] && cart[key].extraOn) {
+      const g         = getGroupByCardId(cardId);
+      const w         = g?.weights[wi];
+      const addonCb   = document.getElementById(cardId + '_addon');
+      const addonOn   = addonCb?.checked || cart[key].addonOn;
+      // Recalc unit price without extra
+      cart[key].extraOn   = false;
+      cart[key].extraQty  = 0;
+      cart[key].unitPrice = (w?.price || cart[key].basePrice)
+                          + (addonOn ? (g?.addonPrice || 0) : 0);
+      // Rebuild details string
+      const details = [];
+      if (addonOn && g?.addonPrice) details.push(`Head & Tail +₹${g.addonPrice}`);
+      cart[key].details = details.join(', ');
+    }
+
+    // Visual feedback on the toggle row
+    const toggle = extraCb.closest('.extra-toggle');
+    if (toggle) {
+      toggle.style.opacity = '0.4';
+      toggle.style.cursor  = 'not-allowed';
+      toggle.title = 'Extra pieces only available for Qty 1';
+    }
+  } else {
+    // Re-enable
+    extraCb.disabled = false;
+    const toggle = extraCb.closest('.extra-toggle');
+    if (toggle) {
+      toggle.style.opacity = '';
+      toggle.style.cursor  = '';
+      toggle.title = '';
+    }
+  }
 }
 
 function removeFromCart(key) {

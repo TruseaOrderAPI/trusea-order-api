@@ -1478,7 +1478,7 @@ async function genOrderId() {
   } catch(e) {
     // Fallback: random 4-digit to avoid blank
     console.warn('genOrderId fallback:', e.message);
-    return 'TS-' + String(Math.floor(1000 + Math.random() * 9000));
+    return 'TSF-' + String(Math.floor(1000 + Math.random() * 9000));
   }
 }
 

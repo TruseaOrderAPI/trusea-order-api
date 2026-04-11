@@ -1506,12 +1506,15 @@ async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems,
   const addonsAll     = inStockItems.map(([, i]) => i.details).filter(Boolean).join(' | ');
   const preBookNames  = preBookItems.map(([, i]) => i.label).join(' | ');
 
-  // Price = sum of (qty × unitPrice) for in-stock items — not totalled as one number
-  // Per spec: show product price + addon price, not summed
+  // Price format: ₹unitPrice×qty+₹addonAmt
+  // This allows dashboard to extract qty, unit price, and addon separately
   const priceBreakdown = inStockItems.map(([, i]) => {
-    const baseP = i.basePrice || i.unitPrice;
-    const addonAmt = i.unitPrice - baseP;
-    return `₹${baseP}${addonAmt > 0 ? '+₹'+addonAmt : ''}`;
+    const baseP    = i.basePrice || i.unitPrice;
+    const addonAmt = i.unitPrice - baseP; // addon per unit
+    // Embed qty in price: ₹1380×2+₹199 or ₹1380×1+₹199 or ₹1380×2
+    let seg = `₹${baseP}×${i.qty}`;
+    if (addonAmt > 0) seg += `+₹${addonAmt}`;
+    return seg;
   }).join(' | ');
 
   const orderRow = {

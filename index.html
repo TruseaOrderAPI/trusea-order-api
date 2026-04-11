@@ -1407,33 +1407,20 @@ function getLocation() {
   );
 }
 
-/* ══ ORDER ID — Sequential from sheet ═══════════ */
+/* ══ ORDER ID — Sequential via Apps Script ═══════════ */
 async function genOrderId() {
-  // Fetch Sheet2 to find last TS-XXXX order ID and increment
   try {
-    const url = `https://docs.google.com/spreadsheets/d/${CONFIG.SHEET_ID}/gviz/tq?tqx=out:csv&sheet=Sheet2&v=${Date.now()}`;
+    // Apps Script doGet returns { nextId: "TS-0042" }
+    const url = CONFIG.APPS_SCRIPT_URL + '?action=nextId&v=' + Date.now();
     const res  = await fetch(url);
     if (!res.ok) throw new Error('fetch failed');
-    const csv  = await res.text();
-    const lines = csv.trim().split('\n').slice(1); // skip header
-
-    let maxNum = 0;
-    lines.forEach(line => {
-      // Order ID is column B (index 1) — "TS-0001" or "TSF-0001"
-      const cols = line.split(',');
-      const idRaw = (cols[1] || '').replace(/"/g, '').trim();
-      const m = idRaw.match(/(\d+)$/);
-      if (m) {
-        const n = parseInt(m[1]);
-        if (n > maxNum) maxNum = n;
-      }
-    });
-
-    const next = maxNum + 1;
-    return 'TS-' + String(next).padStart(4, '0');
+    const data = await res.json();
+    if (data.nextId) return data.nextId;
+    throw new Error('no nextId');
   } catch(e) {
-    // Fallback: timestamp-based to avoid collision
-    return 'TS-' + String(Date.now()).slice(-4);
+    // Fallback: random 4-digit to avoid blank
+    console.warn('genOrderId fallback:', e.message);
+    return 'TS-' + String(Math.floor(1000 + Math.random() * 9000));
   }
 }
 

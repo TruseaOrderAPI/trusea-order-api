@@ -721,384 +721,13 @@ header {
 .cfg-box strong { display: block; margin-bottom: 3px; font-size: 13.5px; }
 .cfg-box code { background: rgba(0,0,0,0.3); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
 
-/* ── Slice variant buttons (Large/Medium Slices) ── */
-.slice-variant-row {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 6px;
-}
-
-.slice-var-btn {
-  background: var(--glass);
-  border: 0.5px solid var(--glass-border);
-  border-radius: 100px;
-  padding: 5px 13px;
-  font-family: inherit;
-  font-size: 11px;
-  font-weight: 700;
-  color: var(--text2);
-  cursor: pointer;
-  transition: all 0.15s;
-  letter-spacing: 0.2px;
-  text-transform: uppercase;
-}
-
-.slice-var-btn:hover { background: var(--glass-hover); color: var(--text); }
-.slice-var-btn.sel   { background: rgba(45,212,176,0.18); border-color: var(--teal); color: var(--teal); }
-
-/* ── Meena Rani AI Overlay ── */
-#meena-overlay {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: none;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-#meena-overlay.open {
-  display: flex;
-  flex-direction: column;
-}
-
-#meena-overlay.visible {
-  opacity: 1;
-}
-
-.meena-bg {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg,
-    #020b18 0%,
-    #041428 15%,
-    #031a3a 35%,
-    #052545 55%,
-    #062e50 75%,
-    #0a3a60 100%
-  );
-  overflow: hidden;
-}
-
-/* Animated ocean rays */
-.meena-bg::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: 
-    radial-gradient(ellipse 60% 40% at 20% 80%, rgba(45,212,176,0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 60% at 80% 60%, rgba(96,165,250,0.07) 0%, transparent 60%),
-    radial-gradient(ellipse 80% 30% at 50% 100%, rgba(45,212,176,0.12) 0%, transparent 50%);
-  animation: oceanPulse 6s ease-in-out infinite alternate;
-}
-
-@keyframes oceanPulse {
-  0%   { opacity: 0.6; transform: scale(1); }
-  100% { opacity: 1;   transform: scale(1.05); }
-}
-
-/* Bubble particles */
-.meena-bubbles {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.bubble {
-  position: absolute;
-  border-radius: 50%;
-  background: rgba(45,212,176,0.15);
-  border: 0.5px solid rgba(45,212,176,0.3);
-  animation: rise linear infinite;
-}
-
-@keyframes rise {
-  0%   { transform: translateY(0) scale(1); opacity: 0.7; }
-  100% { transform: translateY(-110vh) scale(0.3); opacity: 0; }
-}
-
-/* Caustics light patterns */
-.meena-bg::after {
-  content: '';
-  position: absolute;
-  width: 200%; height: 200%;
-  top: -50%; left: -50%;
-  background-image: radial-gradient(ellipse 3px 8px at 20% 30%, rgba(45,212,176,0.2) 0%, transparent 100%),
-    radial-gradient(ellipse 5px 3px at 60% 70%, rgba(96,165,250,0.15) 0%, transparent 100%),
-    radial-gradient(ellipse 2px 6px at 80% 20%, rgba(45,212,176,0.18) 0%, transparent 100%);
-  animation: caustics 8s ease-in-out infinite alternate;
-  pointer-events: none;
-}
-
-@keyframes caustics {
-  0%   { transform: rotate(0deg) scale(1); }
-  100% { transform: rotate(3deg) scale(1.1); }
-}
-
-.meena-close {
-  position: absolute;
-  top: 16px; right: 16px;
-  z-index: 10;
-  width: 40px; height: 40px;
-  background: rgba(255,255,255,0.1);
-  border: 0.5px solid rgba(255,255,255,0.2);
-  border-radius: 50%;
-  color: rgba(255,255,255,0.8);
-  font-size: 18px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.2s;
-  backdrop-filter: blur(10px);
-}
-
-.meena-close:hover { background: rgba(255,255,255,0.2); color: #fff; }
-
-/* Mermaid container */
-.meena-mermaid-wrap {
-  position: absolute;
-  bottom: 42%;
-  left: 50%;
-  transform: translateX(-50%) translateY(120px);
-  width: 200px;
-  opacity: 0;
-  transition: transform 1.2s cubic-bezier(0.34,1.56,0.64,1), opacity 0.8s ease;
-  z-index: 5;
-  pointer-events: none;
-}
-
-.meena-mermaid-wrap.risen {
-  transform: translateX(-50%) translateY(0px);
-  opacity: 1;
-}
-
-.meena-mermaid-svg {
-  width: 200px;
-  filter: drop-shadow(0 0 20px rgba(45,212,176,0.6)) drop-shadow(0 0 40px rgba(45,212,176,0.3));
-  animation: floatMermaid 4s ease-in-out infinite;
-}
-
-@keyframes floatMermaid {
-  0%,100% { transform: translateY(0) rotate(-1deg); }
-  50%     { transform: translateY(-12px) rotate(1deg); }
-}
-
-/* Glow ring under mermaid */
-.meena-glow-ring {
-  position: absolute;
-  bottom: -20px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 120px; height: 30px;
-  background: radial-gradient(ellipse, rgba(45,212,176,0.4) 0%, transparent 70%);
-  border-radius: 50%;
-  animation: glowPulse 2s ease-in-out infinite;
-}
-
-@keyframes glowPulse {
-  0%,100% { opacity: 0.6; transform: translateX(-50%) scaleX(1); }
-  50%     { opacity: 1;   transform: translateX(-50%) scaleX(1.2); }
-}
-
-/* Chat interface */
-.meena-chat-wrap {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  flex-direction: column;
-  z-index: 6;
-  pointer-events: none;
-  opacity: 0;
-  transition: opacity 0.5s ease 0.3s;
-}
-
-.meena-chat-wrap.visible { opacity: 1; pointer-events: auto; }
-
-.meena-chat-header {
-  padding: 16px 20px 12px;
-  padding-top: max(16px, env(safe-area-inset-top));
-  text-align: center;
-  flex-shrink: 0;
-}
-
-.meena-name-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(45,212,176,0.15);
-  border: 0.5px solid rgba(45,212,176,0.4);
-  border-radius: 100px;
-  padding: 6px 14px 6px 10px;
-  font-size: 13px;
-  font-weight: 700;
-  color: var(--teal);
-  letter-spacing: 0.3px;
-  backdrop-filter: blur(12px);
-}
-
-.meena-avatar-dot {
-  width: 8px; height: 8px;
-  border-radius: 50%;
-  background: var(--teal);
-  animation: pulse 2s ease-in-out infinite;
-}
-
-.meena-messages {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px 16px;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  scrollbar-width: thin;
-  scrollbar-color: rgba(45,212,176,0.3) transparent;
-}
-
-.meena-messages::-webkit-scrollbar { width: 4px; }
-.meena-messages::-webkit-scrollbar-thumb { background: rgba(45,212,176,0.3); border-radius: 2px; }
-
-.meena-msg {
-  max-width: 82%;
-  border-radius: 16px;
-  padding: 10px 14px;
-  font-size: 13.5px;
-  line-height: 1.55;
-  animation: msgPop 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
-}
-
-@keyframes msgPop {
-  from { opacity:0; transform: scale(0.85) translateY(6px); }
-  to   { opacity:1; transform: scale(1) translateY(0); }
-}
-
-.meena-msg.agent {
-  align-self: flex-start;
-  background: rgba(45,212,176,0.12);
-  border: 0.5px solid rgba(45,212,176,0.25);
-  color: #e0f7f3;
-  border-bottom-left-radius: 4px;
-}
-
-.meena-msg.user {
-  align-self: flex-end;
-  background: rgba(255,255,255,0.1);
-  border: 0.5px solid rgba(255,255,255,0.15);
-  color: var(--text);
-  border-bottom-right-radius: 4px;
-}
-
-.meena-typing {
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 10px 14px;
-  background: rgba(45,212,176,0.08);
-  border: 0.5px solid rgba(45,212,176,0.2);
-  border-radius: 16px;
-  border-bottom-left-radius: 4px;
-  align-self: flex-start;
-  width: fit-content;
-}
-
-.meena-typing span {
-  width: 7px; height: 7px;
-  border-radius: 50%;
-  background: var(--teal);
-  opacity: 0.4;
-  animation: typingDot 1.2s ease-in-out infinite;
-}
-
-.meena-typing span:nth-child(2) { animation-delay: 0.2s; }
-.meena-typing span:nth-child(3) { animation-delay: 0.4s; }
-
-@keyframes typingDot {
-  0%,80%,100% { opacity:0.3; transform:scale(0.8); }
-  40%         { opacity:1;   transform:scale(1.2); }
-}
-
-/* Typewriter effect */
-.typewriter { overflow: hidden; white-space: pre-wrap; }
-
-.meena-input-row {
-  padding: 10px 16px;
-  padding-bottom: max(10px, env(safe-area-inset-bottom));
-  display: flex;
-  gap: 8px;
-  background: rgba(0,0,0,0.3);
-  backdrop-filter: blur(20px);
-  border-top: 0.5px solid rgba(45,212,176,0.15);
-  flex-shrink: 0;
-}
-
-.meena-input {
-  flex: 1;
-  background: rgba(255,255,255,0.07);
-  border: 0.5px solid rgba(255,255,255,0.15);
-  border-radius: 12px;
-  padding: 10px 14px;
-  font-family: inherit;
-  font-size: 14px;
-  color: var(--text);
-  outline: none;
-  transition: border-color 0.15s;
-}
-
-.meena-input:focus { border-color: var(--teal); }
-.meena-input::placeholder { color: rgba(255,255,255,0.35); }
-
-.meena-send-btn {
-  width: 44px; height: 44px;
-  background: var(--teal);
-  border: none;
-  border-radius: 12px;
-  color: #0a1628;
-  font-size: 18px;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s;
-  flex-shrink: 0;
-}
-
-.meena-send-btn:hover { background: #22c4a0; transform: scale(1.05); }
-.meena-send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-
-/* Recommended fish chips */
-.fish-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-  margin-top: 8px;
-}
-
-.fish-chip {
-  background: rgba(45,212,176,0.15);
-  border: 0.5px solid rgba(45,212,176,0.4);
-  border-radius: 100px;
-  padding: 6px 13px;
-  font-size: 12px;
-  font-weight: 700;
-  color: var(--teal);
-  cursor: pointer;
-  transition: all 0.15s;
-  animation: chipPop 0.3s cubic-bezier(0.34,1.56,0.64,1) both;
-}
-
-.fish-chip:hover {
-  background: var(--teal);
-  color: #0a1628;
-  transform: scale(1.05);
-}
-
-@keyframes chipPop {
-  from { opacity:0; transform:scale(0.7); }
-  to   { opacity:1; transform:scale(1); }
-}
-
 @media (max-width: 520px) {
-  .meena-mermaid-wrap { width: 160px; bottom: 43%; }
-  .meena-mermaid-svg  { width: 160px; }
+  .catalog { grid-template-columns: 1fr; gap: 12px; padding: 10px 12px 150px; }
+  .controls { padding: 14px 12px 4px; }
+  .input-row { flex-direction: column; }
+  .header-inner { padding: 0 14px; }
 }
-
-
+</style>
 </head>
 <body>
 
@@ -1142,7 +771,6 @@ header {
   <button class="pill on" onclick="setFilter('all',this)">All</button>
   <button class="pill" onclick="setFilter('in',this)">✓ In Stock</button>
   <button class="pill" onclick="setFilter('out',this)">📋 Pre-Book</button>
-  <button class="pill meena-pill" onclick="openMeena()">🧜‍♀️ Need help choosing fish?</button>
   <div class="search-wrap">
   <input class="search" id="search-input" type="text" 
     placeholder="Search fish…" oninput="doSearch(this.value)">
@@ -1196,117 +824,6 @@ header {
       <svg class="wa-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
       Send Order via WhatsApp
     </button>
-  </div>
-</div>
-
-<!-- ════════════ MEENA RANI AI OVERLAY ════════════ -->
-<div id="meena-overlay">
-  <div class="meena-bg">
-    <div class="meena-bubbles" id="meena-bubbles"></div>
-  </div>
-
-  <button class="meena-close" onclick="closeMeena()">✕</button>
-
-  <!-- Rising mermaid -->
-  <div class="meena-mermaid-wrap" id="meena-mermaid">
-    <div class="meena-glow-ring"></div>
-    <svg class="meena-mermaid-svg" viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg">
-      <!-- Tail -->
-      <ellipse cx="100" cy="290" rx="50" ry="18" fill="#0d4a3a" opacity="0.6"/>
-      <!-- Tail fin left -->
-      <path d="M60 275 Q30 300 25 310 Q55 295 72 285Z" fill="#1a7a5e"/>
-      <!-- Tail fin right -->
-      <path d="M140 275 Q170 300 175 310 Q145 295 128 285Z" fill="#1a7a5e"/>
-      <!-- Tail body -->
-      <path d="M72 230 Q65 255 60 270 Q100 282 140 270 Q135 255 128 230Z" fill="#2dd4b0"/>
-      <!-- Scales pattern -->
-      <ellipse cx="90" cy="250" rx="12" ry="8" fill="none" stroke="rgba(45,212,176,0.4)" stroke-width="1"/>
-      <ellipse cx="110" cy="250" rx="12" ry="8" fill="none" stroke="rgba(45,212,176,0.4)" stroke-width="1"/>
-      <ellipse cx="100" cy="262" rx="12" ry="8" fill="none" stroke="rgba(45,212,176,0.4)" stroke-width="1"/>
-      <!-- Body -->
-      <ellipse cx="100" cy="175" rx="32" ry="58" fill="#f4c5a0"/>
-      <!-- Seaweed/fins on sides -->
-      <path d="M68 160 Q50 155 45 170 Q52 163 68 170Z" fill="#2dd4b0" opacity="0.7"/>
-      <path d="M132 160 Q150 155 155 170 Q148 163 132 170Z" fill="#2dd4b0" opacity="0.7"/>
-      <!-- Bikini top -->
-      <path d="M78 155 Q100 148 122 155 Q118 170 100 172 Q82 170 78 155Z" fill="#0d7a6a"/>
-      <!-- Shell details -->
-      <ellipse cx="90" cy="161" rx="8" ry="5" fill="#2dd4b0" opacity="0.6"/>
-      <ellipse cx="110" cy="161" rx="8" ry="5" fill="#2dd4b0" opacity="0.6"/>
-      <!-- Neck -->
-      <rect x="88" y="115" width="24" height="25" rx="6" fill="#f0bb96"/>
-      <!-- Head -->
-      <ellipse cx="100" cy="100" rx="32" ry="35" fill="#f0bb96"/>
-      <!-- Hair flowing -->
-      <path d="M68 82 Q55 60 62 40 Q72 70 75 95Z" fill="#2d1a0e"/>
-      <path d="M132 82 Q145 60 138 40 Q128 70 125 95Z" fill="#2d1a0e"/>
-      <path d="M70 90 Q65 120 68 145 Q75 130 78 110Z" fill="#2d1a0e" opacity="0.8"/>
-      <path d="M130 90 Q135 120 132 145 Q125 130 122 110Z" fill="#2d1a0e" opacity="0.8"/>
-      <ellipse cx="100" cy="72" rx="32" ry="28" fill="#2d1a0e"/>
-      <!-- Face features -->
-      <!-- Eyes -->
-      <ellipse cx="88" cy="96" rx="7" ry="8" fill="white"/>
-      <ellipse cx="112" cy="96" rx="7" ry="8" fill="white"/>
-      <ellipse cx="89" cy="97" rx="4.5" ry="5" fill="#3d1a00"/>
-      <ellipse cx="113" cy="97" rx="4.5" ry="5" fill="#3d1a00"/>
-      <circle cx="90" cy="95" r="1.5" fill="white"/>
-      <circle cx="114" cy="95" r="1.5" fill="white"/>
-      <!-- Eyelashes -->
-      <line x1="83" y1="89" x2="82" y2="85" stroke="#2d1a0e" stroke-width="1.2" stroke-linecap="round"/>
-      <line x1="88" y1="88" x2="87" y2="84" stroke="#2d1a0e" stroke-width="1.2" stroke-linecap="round"/>
-      <line x1="93" y1="89" x2="94" y2="85" stroke="#2d1a0e" stroke-width="1.2" stroke-linecap="round"/>
-      <line x1="107" y1="89" x2="106" y2="85" stroke="#2d1a0e" stroke-width="1.2" stroke-linecap="round"/>
-      <line x1="112" y1="88" x2="113" y2="84" stroke="#2d1a0e" stroke-width="1.2" stroke-linecap="round"/>
-      <line x1="117" y1="89" x2="118" y2="85" stroke="#2d1a0e" stroke-width="1.2" stroke-linecap="round"/>
-      <!-- Cheek blush -->
-      <ellipse cx="80" cy="104" rx="8" ry="5" fill="rgba(255,150,120,0.3)"/>
-      <ellipse cx="120" cy="104" rx="8" ry="5" fill="rgba(255,150,120,0.3)"/>
-      <!-- Smile -->
-      <path d="M91 112 Q100 119 109 112" fill="none" stroke="#c0705a" stroke-width="1.8" stroke-linecap="round"/>
-      <!-- Nose -->
-      <path d="M97 106 Q100 110 103 106" fill="none" stroke="rgba(180,100,80,0.5)" stroke-width="1.2" stroke-linecap="round"/>
-      <!-- Crown/tiara -->
-      <path d="M74 78 L78 60 L85 72 L100 55 L115 72 L122 60 L126 78Z" fill="#2dd4b0" opacity="0.9"/>
-      <circle cx="100" cy="55" r="4" fill="#fb923c"/>
-      <circle cx="85" cy="72" r="3" fill="#60a5fa"/>
-      <circle cx="115" cy="72" r="3" fill="#60a5fa"/>
-      <!-- Seaweed necklace -->
-      <path d="M80 130 Q90 124 100 128 Q110 124 120 130" fill="none" stroke="#2dd4b0" stroke-width="2" stroke-linecap="round"/>
-      <circle cx="100" cy="128" r="3" fill="#fb923c"/>
-      <!-- Arms -->
-      <path d="M68 150 Q52 165 55 185 Q62 178 70 168Z" fill="#f0bb96"/>
-      <path d="M132 150 Q148 165 145 185 Q138 178 130 168Z" fill="#f0bb96"/>
-      <!-- Sparkles around -->
-      <g fill="#2dd4b0" opacity="0.7">
-        <circle cx="35" cy="130" r="2" class="sparkle"/>
-        <circle cx="165" cy="145" r="2.5"/>
-        <circle cx="42" cy="200" r="1.5"/>
-        <circle cx="158" cy="210" r="2"/>
-        <circle cx="28" cy="170" r="3"/>
-        <circle cx="172" cy="175" r="1.5"/>
-      </g>
-      <g fill="#fb923c" opacity="0.6">
-        <polygon points="40,110 42,116 48,116 43,120 45,126 40,122 35,126 37,120 32,116 38,116" transform="scale(0.5) translate(40,-20)"/>
-        <polygon points="320,230 322,236 328,236 323,240 325,246 320,242 315,246 317,240 312,236 318,236" transform="scale(0.5) translate(-120,-80)"/>
-      </g>
-    </svg>
-  </div>
-
-  <!-- Chat UI -->
-  <div class="meena-chat-wrap" id="meena-chat">
-    <div class="meena-chat-header">
-      <div class="meena-name-badge">
-        <div class="meena-avatar-dot"></div>
-        Meena Rani · Your Fish Guide
-      </div>
-    </div>
-    <div class="meena-messages" id="meena-messages"></div>
-    <div class="meena-input-row">
-      <input class="meena-input" id="meena-input" type="text" 
-        placeholder="Tell me your preference…" 
-        onkeydown="if(event.key==='Enter')sendMeenaMsg()">
-      <button class="meena-send-btn" id="meena-send" onclick="sendMeenaMsg()">➤</button>
-    </div>
   </div>
 </div>
 
@@ -1399,33 +916,27 @@ function parseCSV(csv) {
 }
 
 function groupProducts(rows) {
-  // Group by Name only — same fish name = one card
-  // Within each name, group by variant (Large Slices, Medium Slices, etc.)
-  // Within each variant, multiple weight options (500g, 1kg)
-  const nameMap = new Map();
+  // Group by Name + Variant (same name+variant = same card, multiple weight options)
+  // Actually: same Name + Variant = one card, different Gross/Net = weight options within
+  // But from sheet: each row is a distinct weight option for that Name+Variant combo
+  const map = new Map();
   rows.forEach(r => {
-    const nameKey = r.name;
-    if (!nameMap.has(nameKey)) {
-      nameMap.set(nameKey, {
-        id:       nameKey.replace(/[^a-zA-Z0-9]/g,'_'),
+    const key = r.name + '||' + r.variant;
+    if (!map.has(key)) {
+      map.set(key, {
+        id:       key.replace(/[^a-zA-Z0-9]/g,'_'),
         name:     r.name,
         type:     r.type,
         category: r.category,
+        variant:  r.variant,
         imageUrl: r.imageUrl,
         idealFor: r.idealFor,
         addonPrice: r.addonPrice,
         extraPPP:   r.extraPPP,
-        sliceVariants: [] // [{variant, weights:[]}]
+        weights: []
       });
     }
-    const card = nameMap.get(nameKey);
-    // find or create sliceVariant group
-    let sv = card.sliceVariants.find(s => s.variant === r.variant);
-    if (!sv) {
-      sv = { variant: r.variant, weights: [] };
-      card.sliceVariants.push(sv);
-    }
-    sv.weights.push({
+    map.get(key).weights.push({
       gross:   r.gross,
       net:     r.net,
       pieces:  r.pieces,
@@ -1435,10 +946,8 @@ function groupProducts(rows) {
       inStock: r.inStock,
       sizeVariant: r.sizeVariant,
     });
-    // update imageUrl if this row has one and card doesn't yet
-    if (!card.imageUrl && r.imageUrl) card.imageUrl = r.imageUrl;
   });
-  return Array.from(nameMap.values());
+  return Array.from(map.values());
 }
   
   function scrollToTop() {
@@ -1466,13 +975,13 @@ function render() {
   let list = groups;
 
   if (activeFilter === 'in')
-    list = list.filter(g => g.sliceVariants.some(sv => sv.weights.some(w => w.inStock)));
+    list = list.filter(g => g.weights.some(w => w.inStock));
   if (activeFilter === 'out')
-    list = list.filter(g => g.sliceVariants.every(sv => sv.weights.every(w => !w.inStock)));
+    list = list.filter(g => g.weights.every(w => !w.inStock));
   if (searchQ)
     list = list.filter(g =>
       g.name.toLowerCase().includes(searchQ) ||
-      g.sliceVariants.some(sv => sv.variant.toLowerCase().includes(searchQ)) ||
+      g.variant.toLowerCase().includes(searchQ) ||
       g.category.toLowerCase().includes(searchQ)
     );
 
@@ -1496,34 +1005,22 @@ function render() {
 function cardHTML(g, gi) {
   const isFish    = g.type.toLowerCase() === 'fish';
   const isBigFish = g.category.toLowerCase().includes('big');
+  const firstW    = g.weights[0];
+  const allOOS    = g.weights.every(w => !w.inStock);
   const cardId    = `card_${gi}`;
 
-  // Default selected slice variant = first
-  const firstSV   = g.sliceVariants[0];
-  const firstW    = firstSV.weights[0];
-  const allOOS    = g.sliceVariants.every(sv => sv.weights.every(w => !w.inStock));
+  // Weight variant buttons
+  const varButtons = g.weights.map((w, wi) => `
+  <button
+    class="var-btn ${wi===0?'sel':''} ${!w.inStock?'oos-v':''}"
+    onclick="selectVariant('${cardId}',${wi})"
+    ${!w.inStock?'title="Out of Stock"':''}
+  >
+    ${w.sizeVariant || 'Standard'}
+  </button>
+`).join('');
 
-  // Slice variant buttons (Large Slices, Medium Slices, etc.)
-  const hasMultiVariants = g.sliceVariants.length > 1;
-  const sliceButtons = hasMultiVariants ? g.sliceVariants.map((sv, svi) => `
-    <button
-      class="slice-var-btn ${svi===0?'sel':''}"
-      onclick="selectSliceVariant('${cardId}',${svi})"
-    >${sv.variant}</button>
-  `).join('') : '';
-
-  // Weight buttons for first slice variant
-  const weightButtons = firstSV.weights.map((w, wi) => `
-    <button
-      class="var-btn ${wi===0?'sel':''} ${!w.inStock?'oos-v':''}"
-      onclick="selectWeight('${cardId}',${wi})"
-      ${!w.inStock?'title="Out of Stock"':''}
-    >
-      ${w.sizeVariant || 'Standard'}
-    </button>
-  `).join('');
-
-  // Addon row
+  // Addon row (Head & Tail) — only for Fish type
   const addonRow = isFish && g.addonPrice > 0 ? `
     <label class="addon-row" for="${cardId}_addon">
       <input class="addon-cb" type="checkbox" id="${cardId}_addon"
@@ -1533,7 +1030,7 @@ function cardHTML(g, gi) {
     </label>
   ` : '';
 
-  // Extra pieces
+  // Extra pieces — only for Big Fish
   const extraRow = isBigFish && g.extraPPP > 0 ? `
     <div class="extra-section">
       <label class="extra-toggle" for="${cardId}_extra">
@@ -1551,8 +1048,12 @@ function cardHTML(g, gi) {
     </div>
   ` : '';
 
-  const idealRow = g.idealFor ? `<div class="ideal-row"><strong>Ideal for:</strong> ${g.idealFor}</div>` : '';
+  // Ideal for
+  const idealRow = g.idealFor ? `
+    <div class="ideal-row"><strong>Ideal for:</strong> ${g.idealFor}</div>
+  ` : '';
 
+  // Image
   const imgHTML = g.imageUrl
     ? `<img class="card-img" src="${g.imageUrl}" alt="${g.name}"
          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
@@ -1570,26 +1071,22 @@ function cardHTML(g, gi) {
 
     <div class="card-body">
       <div class="card-name">${g.name}</div>
+      <div class="card-variant-label">${g.variant}</div>
 
-      <!-- Slice variant buttons (Large/Medium Slices) -->
-      ${hasMultiVariants ? `
-        <div class="slice-variant-row" id="${cardId}_svbtns">${sliceButtons}</div>
-      ` : `<div class="card-variant-label">${firstSV.variant}</div>`}
-
-      <!-- Dynamic specs -->
+      <!-- Dynamic specs — updates with variant selection -->
       <div class="specs" id="${cardId}_specs">
         ${specsHTML(firstW)}
       </div>
 
-      <!-- Weight selector -->
-      ${firstSV.weights.length > 1 ? `
+      <!-- Weight variant selector -->
+      ${g.weights.length > 1 ? `
         <div class="variant-section">
           <div class="variant-label-row">Select Weight</div>
           <div class="variant-buttons" id="${cardId}_vbtns">
-            ${weightButtons}
+            ${varButtons}
           </div>
         </div>
-      ` : `<div class="variant-buttons" id="${cardId}_vbtns" style="display:none">${weightButtons}</div>`}
+      ` : ''}
 
       <!-- Price -->
       <div class="price-row">
@@ -1603,6 +1100,7 @@ function cardHTML(g, gi) {
 
       <div class="delivery-row"><strong>Delivery time:</strong> ${allOOS ? 'Ships as soon as available' : 'Immediately available'}</div>
 
+      <!-- Footer -->
       <div class="card-footer">
         <div class="qty-ctrl" id="${cardId}_qty">
           <button class="qc-btn" onclick="changeQty('${cardId}',-1)">−</button>
@@ -1620,87 +1118,30 @@ function cardHTML(g, gi) {
 
 function specsHTML(w) {
   const parts = [];
+  if (w.pieces)  parts.push(`<span class="spec-item"><span class="spec-label">Pieces / Slices:</span><span class="spec-val">${w.pieces}</span></span>`);
   if (w.gross)   parts.push(`<span class="spec-item"><span class="spec-label">Gross:</span><span class="spec-val">${w.gross}</span></span>`);
   if (w.net)     parts.push(`<span class="spec-item"><span class="spec-label">Net:</span><span class="spec-val">${w.net}</span></span>`);
-  if (w.pieces)  parts.push(`<span class="spec-item"><span class="spec-label">Pieces:</span><span class="spec-val">${w.pieces}</span></span>`);
   if (w.serves)  parts.push(`<span class="spec-item"><span class="spec-label">Serves:</span><span class="spec-val">${w.serves}</span></span>`);
   if (w.cutSize) parts.push(`<span class="spec-item"><span class="spec-label">Cut:</span><span class="spec-val">${w.cutSize}</span></span>`);
   return parts.join('');
 }
 
-/* ══ SLICE VARIANT & WEIGHT SELECTION ══════════════ */
-const selSliceVariant = {}; // cardId -> sliceVariant index
-const selVariant = {};      // cardId -> weight index within current slice variant
+/* ══ VARIANT SELECTION ══════════════ */
+// Store selected variant index per card
+const selVariant = {};
 
-function getCurrentSV(cardId, g) {
-  const svi = selSliceVariant[cardId] || 0;
-  return g.sliceVariants[svi];
-}
-
-function getCurrentW(cardId, g) {
-  const sv = getCurrentSV(cardId, g);
-  const wi = selVariant[cardId] || 0;
-  return sv.weights[wi] || sv.weights[0];
-}
-
-function selectSliceVariant(cardId, svi) {
+function selectVariant(cardId, wi) {
   const g = getGroupByCardId(cardId);
   if (!g) return;
-  selSliceVariant[cardId] = svi;
-  selVariant[cardId] = 0; // reset weight selection
+  const w = g.weights[wi];
 
-  const sv = g.sliceVariants[svi];
-  const w  = sv.weights[0];
-
-  // Update slice variant buttons
-  document.querySelectorAll(`#${cardId}_svbtns .slice-var-btn`).forEach((b, i) =>
-    b.classList.toggle('sel', i === svi));
-
-  // Rebuild weight buttons
-  const vbtnsEl = document.getElementById(cardId + '_vbtns');
-  if (vbtnsEl) {
-    if (sv.weights.length > 1) {
-      vbtnsEl.style.display = '';
-      vbtnsEl.innerHTML = sv.weights.map((ww, wi) => `
-        <button class="var-btn ${wi===0?'sel':''} ${!ww.inStock?'oos-v':''}"
-          onclick="selectWeight('${cardId}',${wi})"
-          ${!ww.inStock?'title="Out of Stock"':''}>
-          ${ww.sizeVariant || 'Standard'}
-        </button>
-      `).join('');
-    } else {
-      vbtnsEl.style.display = 'none';
-    }
-  }
-
-  // Show variant section wrapper only if needed
-  const varSection = vbtnsEl?.closest('.variant-section');
-  if (varSection) varSection.style.display = sv.weights.length > 1 ? '' : 'none';
-
-  updateSpecsAndStock(cardId, g, w);
-  updatePrice(cardId);
-}
-
-function selectWeight(cardId, wi) {
-  const g = getGroupByCardId(cardId);
-  if (!g) return;
   selVariant[cardId] = wi;
 
-  const sv = getCurrentSV(cardId, g);
-  const w  = sv.weights[wi];
-
-  // Update weight buttons
-  const btns = document.querySelectorAll(`#${cardId}_vbtns .var-btn`);
-  btns.forEach((b, i) => b.classList.toggle('sel', i === wi));
-
-  updateSpecsAndStock(cardId, g, w);
-  updatePrice(cardId);
-}
-
-function updateSpecsAndStock(cardId, g, w) {
   // Update specs
-  const specsEl = document.getElementById(cardId + '_specs');
-  if (specsEl) specsEl.innerHTML = specsHTML(w);
+  document.getElementById(cardId + '_specs').innerHTML = specsHTML(w);
+
+  // Update price display
+  updatePrice(cardId);
 
   // Update stock tag
   const tag = document.getElementById(cardId + '_stag');
@@ -1711,12 +1152,12 @@ function updateSpecsAndStock(cardId, g, w) {
 
   // Update add button
   const btn = document.getElementById(cardId + '_addbtn');
-  if (btn && !btn.classList.contains('added')) {
+  if (btn) {
     btn.disabled = false;
     if (!w.inStock) {
       btn.textContent = '📋 Pre-Book';
       btn.classList.add('prebook-btn');
-    } else {
+    } else if (!btn.classList.contains('added')) {
       btn.textContent = 'Add';
       btn.classList.remove('prebook-btn');
     }
@@ -1725,10 +1166,11 @@ function updateSpecsAndStock(cardId, g, w) {
   // Update card oos class
   const card = document.getElementById(cardId);
   if (card) card.classList.toggle('oos', !w.inStock);
-}
 
-// Backward-compat alias
-function selectVariant(cardId, wi) { selectWeight(cardId, wi); }
+  // Highlight selected button
+  const btns = document.querySelectorAll(`#${cardId}_vbtns .var-btn`);
+  btns.forEach((b, i) => b.classList.toggle('sel', i === wi));
+}
 
 function getGroupByCardId(cardId) {
   const idx = parseInt(cardId.replace('card_',''));
@@ -1747,11 +1189,11 @@ function getGroupByCardId(cardId) {
 
 function getFilteredGroups() {
   let list = groups;
-  if (activeFilter === 'in')  list = list.filter(g => g.sliceVariants.some(sv => sv.weights.some(w => w.inStock)));
-  if (activeFilter === 'out') list = list.filter(g => g.sliceVariants.every(sv => sv.weights.every(w => !w.inStock)));
+  if (activeFilter === 'in')  list = list.filter(g => g.weights.some(w => w.inStock));
+  if (activeFilter === 'out') list = list.filter(g => g.weights.every(w => !w.inStock));
   if (searchQ) list = list.filter(g =>
     g.name.toLowerCase().includes(searchQ) ||
-    g.sliceVariants.some(sv => sv.variant.toLowerCase().includes(searchQ)) ||
+    g.variant.toLowerCase().includes(searchQ) ||
     g.category.toLowerCase().includes(searchQ)
   );
   return list;
@@ -1761,7 +1203,8 @@ function getFilteredGroups() {
 function updatePrice(cardId) {
   const g = getGroupByCardId(cardId);
   if (!g) return;
-  const w = getCurrentW(cardId, g);
+  const wi = selVariant[cardId] || 0;
+  const w  = g.weights[wi];
   let total = w.price;
 
   const addonCb = document.getElementById(cardId + '_addon');
@@ -1802,10 +1245,8 @@ const qtyVals = {};
 function addToCart(cardId) {
   const g = getGroupByCardId(cardId);
   if (!g) return;
-  const svi = selSliceVariant[cardId] || 0;
-  const wi  = selVariant[cardId] || 0;
-  const sv  = g.sliceVariants[svi];
-  const w   = sv.weights[wi];
+  const wi = selVariant[cardId] || 0;
+  const w  = g.weights[wi];
   const isPreBook = !w.inStock;
 
   const addonCb  = document.getElementById(cardId + '_addon');
@@ -1819,9 +1260,9 @@ function addToCart(cardId) {
     + (addonOn ? g.addonPrice : 0)
     + (extraOn ? extraQty * g.extraPPP : 0);
 
-  const key = cardId + '_' + svi + '_' + wi;
-  const label = `${g.name} – ${sv.variant} (${w.gross} / Net ${w.net})`;
-  const details = [];
+  const key = cardId + '_' + wi;
+  const label = `${g.name} – ${g.variant} (${w.gross} / Net ${w.net})`;
+  const details = []
   if (addonOn) details.push(`Head & Tail +₹${g.addonPrice}`);
   if (extraOn) details.push(`${extraQty} extra piece(s) +₹${extraQty * g.extraPPP}`);
 
@@ -1838,10 +1279,12 @@ function addToCart(cardId) {
     };
   }
 
+  // Show qty control, hide add btn
   const btn = document.getElementById(cardId + '_addbtn');
   const qc  = document.getElementById(cardId + '_qty');
   if (btn) { btn.style.display = 'none'; }
   if (qc)  { qc.classList.add('show'); }
+  qtyVals[key] = cart[key].qty;
   const qval = document.getElementById(cardId + '_qval');
   if (qval) qval.textContent = cart[key].qty;
 
@@ -1849,9 +1292,8 @@ function addToCart(cardId) {
 }
 
 function changeQty(cardId, delta) {
-  const svi = selSliceVariant[cardId] || 0;
   const wi  = selVariant[cardId] || 0;
-  const key = cardId + '_' + svi + '_' + wi;
+  const key = cardId + '_' + wi;
   if (!cart[key]) return;
   cart[key].qty = Math.max(0, cart[key].qty + delta);
   const qval = document.getElementById(cardId + '_qval');
@@ -1863,8 +1305,10 @@ function changeQty(cardId, delta) {
     const qc  = document.getElementById(cardId + '_qty');
     if (btn) { btn.style.display = ''; btn.textContent = 'Add'; }
     if (qc)  { qc.classList.remove('show'); }
+    // Re-enable extra when removed from cart
     syncExtraState(cardId, 1);
   } else {
+    // qty >= 2 → disable extra pieces
     syncExtraState(cardId, cart[key].qty);
   }
 
@@ -1878,28 +1322,31 @@ function syncExtraState(cardId, qty) {
   if (!extraCb) return;
 
   if (qty >= 2) {
+    // Disable + uncheck + hide counter
     extraCb.checked  = false;
     extraCb.disabled = true;
     if (extraEc) extraEc.classList.remove('show');
 
-    const svi = selSliceVariant[cardId] || 0;
+    // Update cart item — remove extra from price/details
     const wi  = selVariant[cardId] || 0;
-    const key = cardId + '_' + svi + '_' + wi;
+    const key = cardId + '_' + wi;
     if (cart[key] && cart[key].extraOn) {
       const g         = getGroupByCardId(cardId);
-      const sv        = g?.sliceVariants[svi];
-      const w         = sv?.weights[wi];
+      const w         = g?.weights[wi];
       const addonCb   = document.getElementById(cardId + '_addon');
       const addonOn   = addonCb?.checked || cart[key].addonOn;
+      // Recalc unit price without extra
       cart[key].extraOn   = false;
       cart[key].extraQty  = 0;
       cart[key].unitPrice = (w?.price || cart[key].basePrice)
                           + (addonOn ? (g?.addonPrice || 0) : 0);
+      // Rebuild details string
       const details = [];
       if (addonOn && g?.addonPrice) details.push(`Head & Tail +₹${g.addonPrice}`);
       cart[key].details = details.join(', ');
     }
 
+    // Visual feedback on the toggle row
     const toggle = extraCb.closest('.extra-toggle');
     if (toggle) {
       toggle.style.opacity = '0.4';
@@ -1907,6 +1354,7 @@ function syncExtraState(cardId, qty) {
       toggle.title = 'Extra pieces only available for Qty 1';
     }
   } else {
+    // Re-enable
     extraCb.disabled = false;
     const toggle = extraCb.closest('.extra-toggle');
     if (toggle) {
@@ -2185,255 +1633,6 @@ function toggleSearch() {
   inp.classList.toggle('open');
   if (inp.classList.contains('open')) inp.focus();
   else { inp.value = ''; doSearch(''); }
-}
-
-/* ══ MEENA RANI AI FISH ADVISOR ══════════════ */
-let meenaHistory = [];
-let meenaTyping  = false;
-let meenaAwaitingFishClick = false;
-
-const FISH_LIST = [
-  'Seer (Vanjaram)','Barracuda (Seela)','Mackerel (Kanangathai)','Pink Perch (Sankara)',
-  'White Prawns (Vella Yera)','Lady Fish (Kizhangaan)','Anchovy (Nethili)','Sardines (Mathi)',
-  'White Pomfret (Vella Vavval)','Black Pomfret (Karuppu Vavval)','Tuna (Choora)',
-  'Barramundi (Koduva)','Tiger Prawns (Vari Iral)','Emperor (Villai Meen)','Squid (Kanava)',
-  'Trevally (Thegai Paarai)','Blue Crab (Neela Nandu)','Diamond Trevally (Kannadi Paarai)',
-  'Snapper (Manja Sankara)','Spot Grouper (Kalava)','Cod (Kalavan)','Indian Salmon (Kala)',
-  'Sea Murrel (Kadal Veral)','Silver Belly (Karapodi)','Gar Fish (Kola)','Parrot Fish (Kili Meen)',
-  'Rohu (Kannadi Kendai)','Mud Crab (Pachai Nandu)','Sea Crab (Kadal Nandu)','Clams (Aali)',
-  'Black Sea Bass (Kal Koduva)','Red Sea Bass (Sigappu Koduva)','Croaker (Panna)',
-  'Sickle Fish (Tharatta)','Grey Snapper (Mada Sankara)','Mahi Mahi (Parla)',
-  'White Snapper (Korkkai)','Lobster','Rainbow Runner','Flathead Grey Mullet (Madavai Meen)'
-];
-
-const MEENA_SYSTEM = `You are Meena Rani, TruSea Fish's beautiful sea angel AI assistant who helps customers choose the perfect fish.
-Personality: Warm, poetic, ocean-spirited. Use occasional ocean metaphors. Keep responses SHORT and FRIENDLY (max 4 lines).
-Fish list: ${FISH_LIST.join(', ')}
-
-Step 1: Ask purpose (Diet/Weight loss/Muscle gain/Family meal/Guests/Kids/Elderly/Pregnancy/Festival/Regular cooking)
-Step 2: Ask cooking method (Fry/Curry/Grill/Oven/No oil/Steam)
-Step 3: Ask taste preference (Soft/Firm/Meaty/Rich flavor/Mild)
-Step 4: Recommend 2-4 fish using this logic:
-- Diet/Weight loss: Tuna, Rainbow Runner, Barramundi, Cod
-- Muscle gain: Seer, Tuna, Barracuda, Emperor
-- Heart health/Omega3: Sardines, Mackerel, Indian Salmon, Tuna
-- Kids: Sankara, White Pomfret, Barramundi, Croaker
-- Elderly: Pomfret, Sankara, Cod, Barramundi
-- Pregnancy: Sankara, Pomfret, Barramundi, Indian Salmon
-- Family meal: Sankara, Barramundi, Snapper, Croaker
-- Guests/Premium: Seer, Pomfret, Lobster, Tiger Prawns, Spot Grouper
-- Fry: Vanjaram, Barracuda, Croaker, Sankara, Anchovy
-- Curry: Sankara, Snapper, Barramundi, Mackerel, Sardines
-- Grill: Seer, Tuna, Barramundi, Mahi Mahi, Emperor
-
-IMPORTANT: After recommendations, end with EXACTLY this JSON block on the last line (no extra text after):
-FISHCHIPS:["Fish Name 1","Fish Name 2","Fish Name 3"]
-Use exact names from the fish list. This triggers clickable fish buttons for the customer.`;
-
-function openMeena() {
-  const overlay = document.getElementById('meena-overlay');
-  overlay.style.display = 'flex';
-  requestAnimationFrame(() => {
-    overlay.classList.add('open');
-    requestAnimationFrame(() => overlay.classList.add('visible'));
-  });
-  
-  // Generate bubbles
-  const bubbles = document.getElementById('meena-bubbles');
-  bubbles.innerHTML = '';
-  for (let i = 0; i < 20; i++) {
-    const b = document.createElement('div');
-    b.className = 'bubble';
-    const size = 4 + Math.random() * 16;
-    b.style.cssText = `
-      width:${size}px; height:${size}px;
-      left:${Math.random()*100}%;
-      bottom:${-size}px;
-      animation-duration:${4 + Math.random()*6}s;
-      animation-delay:${Math.random()*4}s;
-    `;
-    bubbles.appendChild(b);
-  }
-
-  // Reset chat
-  meenaHistory = [];
-  meenaAwaitingFishClick = false;
-  document.getElementById('meena-messages').innerHTML = '';
-
-  // Animate mermaid rising after short delay
-  setTimeout(() => {
-    document.getElementById('meena-mermaid').classList.add('risen');
-    setTimeout(() => {
-      // Show chat UI
-      document.getElementById('meena-chat').classList.add('visible');
-      // Type intro message
-      const intro = 'Hello dear, welcome to TruSea Fish! I\'m "Meena Rani" 🧜‍♀️ your personal AI guide to the ocean\'s finest catch. What brings you to the sea today?';
-      addMeenaMsg(intro, 'agent', true);
-      meenaHistory.push({ role: 'assistant', content: intro });
-    }, 600);
-  }, 400);
-
-  document.body.style.overflow = 'hidden';
-}
-
-function closeMeena() {
-  const overlay = document.getElementById('meena-overlay');
-  overlay.classList.remove('visible');
-  setTimeout(() => {
-    overlay.classList.remove('open');
-    overlay.style.display = 'none';
-    document.getElementById('meena-mermaid').classList.remove('risen');
-    document.getElementById('meena-chat').classList.remove('visible');
-  }, 400);
-  document.body.style.overflow = '';
-}
-
-function addMeenaMsg(text, role, typewriter = false) {
-  const msgs = document.getElementById('meena-messages');
-
-  // Check for fish chips in text
-  let fishChips = null;
-  let displayText = text;
-  const chipMatch = text.match(/FISHCHIPS:(\[.*?\])/);
-  if (chipMatch) {
-    try { fishChips = JSON.parse(chipMatch[1]); } catch(e) {}
-    displayText = text.replace(/FISHCHIPS:\[.*?\]/, '').trim();
-    meenaAwaitingFishClick = true;
-  }
-
-  const div = document.createElement('div');
-  div.className = `meena-msg ${role}`;
-
-  if (typewriter && role === 'agent') {
-    div.textContent = '';
-    msgs.appendChild(div);
-    msgs.scrollTop = msgs.scrollHeight;
-    let i = 0;
-    const speed = 18;
-    function type() {
-      if (i < displayText.length) {
-        div.textContent += displayText[i++];
-        msgs.scrollTop = msgs.scrollHeight;
-        setTimeout(type, speed);
-      } else if (fishChips) {
-        addFishChips(fishChips, msgs);
-      }
-    }
-    setTimeout(type, 10);
-  } else {
-    div.textContent = displayText;
-    msgs.appendChild(div);
-    if (fishChips) addFishChips(fishChips, msgs);
-    msgs.scrollTop = msgs.scrollHeight;
-  }
-}
-
-function addFishChips(chips, msgs) {
-  const chipRow = document.createElement('div');
-  chipRow.className = 'fish-chips';
-  chips.forEach((fish, i) => {
-    const chip = document.createElement('button');
-    chip.className = 'fish-chip';
-    chip.textContent = '🐟 ' + fish;
-    chip.style.animationDelay = (i * 0.08) + 's';
-    chip.onclick = () => onFishChipClick(fish);
-    chipRow.appendChild(chip);
-  });
-  msgs.appendChild(chipRow);
-  msgs.scrollTop = msgs.scrollHeight;
-}
-
-function onFishChipClick(fishName) {
-  closeMeena();
-  // Find the fish card and scroll to it
-  setTimeout(() => {
-    // Search by fish name
-    searchQ = '';
-    activeFilter = 'all';
-    document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
-    document.querySelector('.pill').classList.add('on');
-    
-    // Try to find matching card
-    const allCards = document.querySelectorAll('.card');
-    let found = null;
-    for (const card of allCards) {
-      const nameEl = card.querySelector('.card-name');
-      if (nameEl && nameEl.textContent.toLowerCase().includes(fishName.toLowerCase().split('(')[0].trim().toLowerCase())) {
-        found = card;
-        break;
-      }
-    }
-    if (found) {
-      found.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Highlight effect
-      found.style.transition = 'box-shadow 0.3s, border-color 0.3s';
-      found.style.boxShadow = '0 0 0 3px rgba(45,212,176,0.7), 0 12px 40px rgba(45,212,176,0.4)';
-      found.style.borderColor = 'var(--teal)';
-      setTimeout(() => {
-        found.style.boxShadow = '';
-        found.style.borderColor = '';
-      }, 2500);
-    } else {
-      // Search for it
-      const input = document.getElementById('search-input');
-      const cleanName = fishName.split('(')[0].trim();
-      if (input) {
-        input.classList.add('open');
-        input.value = cleanName;
-        doSearch(cleanName);
-      }
-    }
-  }, 500);
-}
-
-async function sendMeenaMsg() {
-  if (meenaTyping) return;
-  const input = document.getElementById('meena-input');
-  const text = input.value.trim();
-  if (!text) return;
-  
-  input.value = '';
-  addMeenaMsg(text, 'user');
-  meenaHistory.push({ role: 'user', content: text });
-
-  // Show typing indicator
-  const msgs = document.getElementById('meena-messages');
-  const typingDiv = document.createElement('div');
-  typingDiv.className = 'meena-typing';
-  typingDiv.id = 'meena-typing-indicator';
-  typingDiv.innerHTML = '<span></span><span></span><span></span>';
-  msgs.appendChild(typingDiv);
-  msgs.scrollTop = msgs.scrollHeight;
-
-  meenaTyping = true;
-  document.getElementById('meena-send').disabled = true;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 400,
-        system: MEENA_SYSTEM,
-        messages: meenaHistory
-      })
-    });
-    const data = await res.json();
-    const reply = data.content?.[0]?.text || 'The ocean whispers… please try again 🌊';
-    
-    // Remove typing indicator
-    document.getElementById('meena-typing-indicator')?.remove();
-    
-    meenaHistory.push({ role: 'assistant', content: reply });
-    addMeenaMsg(reply, 'agent', true);
-  } catch(e) {
-    document.getElementById('meena-typing-indicator')?.remove();
-    addMeenaMsg('The ocean waves interrupted us 🌊 Please try again!', 'agent');
-  }
-
-  meenaTyping = false;
-  document.getElementById('meena-send').disabled = false;
 }
 
 /* ══ INIT ═══════════════════════════ */

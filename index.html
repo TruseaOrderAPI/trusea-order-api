@@ -2200,15 +2200,15 @@ function toggleSearch() {
 const MEENA_IMAGE_URL = ''; // ← PASTE YOUR IMAGE URL HERE
 
 const FISH_LIST = [
-  'Seer (Vanjaram)','Barracuda (Seela)','Mackerel (Kanangathai)','Pink Perch (Sankara)',
+  'Seer (Vanjaram)','Baracuda (Seela)','Mackerel (Kanangathai)','Pink Perch (Sankara)',
   'White Prawns (Vella Yera)','Lady Fish (Kizhangaan)','Anchovy (Nethili)','Sardines (Mathi)',
   'White Pomfret (Vella Vavval)','Black Pomfret (Karuppu Vavval)','Tuna (Choora)',
-  'Barramundi (Koduva)','Tiger Prawns (Vari Iral)','Emperor (Villai Meen)','Squid (Kanava)',
-  'Trevally (Thegai Paarai)','Blue Crab (Neela Nandu)','Diamond Trevally (Kannadi Paarai)',
-  'Snapper (Manja Sankara)','Spot Grouper (Kalava)','Cod (Kalavan)','Indian Salmon (Kala)',
+  'Baramudi (Koduva)','Tiger Prawns (Vari Iral)','Emperor (Villai Meen)','Squid (Kanava)',
+  'Trevally (Thengai Paarai)','Blue Crab (Neela Nandu)','Diamond Trevally (Kannadi Paarai)',
+  'Black Spot Snapper (Manja Sankara)','Spot Grouper (Kalava)','Cod (Kalavan)','Indian Salmon (Kala)',
   'Sea Murrel (Kadal Veral)','Silver Belly (Karapodi)','Gar Fish (Kola)','Parrot Fish (Kili Meen)',
   'Rohu (Kannadi Kendai)','Mud Crab (Pachai Nandu)','Sea Crab (Kadal Nandu)','Clams (Aali)',
-  'Black Sea Bass (Kal Koduva)','Red Sea Bass (Sigappu Koduva)','Croaker (Panna)',
+  'Black Sea Bass (Kal Koduva)','Red Sea Bass (Sigappu Koduva)','Croacker (Panna)',
   'Sickle Fish (Tharatta)','Grey Snapper (Mada Sankara)','Mahi Mahi (Parla)',
   'White Snapper (Korkkai)','Lobster','Rainbow Runner','Flathead Grey Mullet (Madavai Meen)'
 ];
@@ -2257,25 +2257,25 @@ const MEENA_FLOW = [
 
 /* Recommendation logic (local — no API needed) */
 const RECO = {
-  'Diet/Weight loss':    ['Tuna (Choora)','Rainbow Runner','Barramundi (Koduva)','Cod (Kalavan)'],
-  'Muscle gain':         ['Seer (Vanjaram)','Tuna (Choora)','Barracuda (Seela)','Emperor (Villai Meen)'],
+  'Diet/Weight loss':    ['Tuna (Choora)','Rainbow Runner','Baramudi (Koduva)','Cod (Kalavan)'],
+  'Muscle gain':         ['Seer (Vanjaram)','Tuna (Choora)','Baracuda (Seela)','Emperor (Villai Meen)'],
   'Heart health/Omega-3':['Sardines (Mathi)','Mackerel (Kanangathai)','Indian Salmon (Kala)','Tuna (Choora)'],
-  'Kids':                ['Pink Perch (Sankara)','White Pomfret (Vella Vavval)','Barramundi (Koduva)','Croaker (Panna)'],
-  'Elderly':             ['White Pomfret (Vella Vavval)','Black Pomfret (Karuppu Vavval)','Pink Perch (Sankara)','Barramundi (Koduva)'],
-  'Pregnancy':           ['Pink Perch (Sankara)','White Pomfret (Vella Vavval)','Barramundi (Koduva)','Indian Salmon (Kala)'],
-  'Family meal':         ['Pink Perch (Sankara)','Barramundi (Koduva)','Snapper (Manja Sankara)','Croaker (Panna)'],
+  'Kids':                ['Pink Perch (Sankara)','White Pomfret (Vella Vavval)','Baramudi (Koduva)','Croacker (Panna)'],
+  'Elderly':             ['White Pomfret (Vella Vavval)','Black Pomfret (Karuppu Vavval)','Pink Perch (Sankara)','Baramudi (Koduva)'],
+  'Pregnancy':           ['Pink Perch (Sankara)','White Pomfret (Vella Vavval)','Baramudi (Koduva)','Indian Salmon (Kala)'],
+  'Family meal':         ['Pink Perch (Sankara)','Baramudi (Koduva)','Black Spot Snapper (Manja Sankara)','Croacker (Panna)'],
   'Guests/Premium':      ['Seer (Vanjaram)','White Pomfret (Vella Vavval)','Lobster','Tiger Prawns (Vari Iral)','Spot Grouper (Kalava)'],
   'Festival':            ['Seer (Vanjaram)','White Pomfret (Vella Vavval)','Tiger Prawns (Vari Iral)','Lobster'],
-  'Regular cooking':     ['Pink Perch (Sankara)','Sardines (Mathi)','Mackerel (Kanangathai)','Croaker (Panna)'],
+  'Regular cooking':     ['Pink Perch (Sankara)','Sardines (Mathi)','Mackerel (Kanangathai)','Croacker (Panna)'],
 };
 
 const COOKING_RECO = {
-  'Fry':        ['Seer (Vanjaram)','Barracuda (Seela)','Croaker (Panna)','Pink Perch (Sankara)','Anchovy (Nethili)'],
-  'Curry':      ['Pink Perch (Sankara)','Snapper (Manja Sankara)','Barramundi (Koduva)','Mackerel (Kanangathai)','Sardines (Mathi)'],
-  'Grill':      ['Seer (Vanjaram)','Tuna (Choora)','Barramundi (Koduva)','Mahi Mahi (Parla)','Emperor (Villai Meen)'],
-  'Oven':       ['Seer (Vanjaram)','Barramundi (Koduva)','Tuna (Choora)','Emperor (Villai Meen)'],
-  'No oil/Steam':['Barramundi (Koduva)','Cod (Kalavan)','White Pomfret (Vella Vavval)','Tuna (Choora)'],
-  'Steam':      ['Barramundi (Koduva)','White Pomfret (Vella Vavval)','Cod (Kalavan)','Pink Perch (Sankara)'],
+  'Fry':        ['Seer (Vanjaram)','Baracuda (Seela)','Croacker (Panna)','Pink Perch (Sankara)','Anchovy (Nethili)'],
+  'Curry':      ['Pink Perch (Sankara)','Black Spot Snapper (Manja Sankara)','Baramudi (Koduva)','Mackerel (Kanangathai)','Sardines (Mathi)'],
+  'Grill':      ['Seer (Vanjaram)','Tuna (Choora)','Baramudi (Koduva)','Mahi Mahi (Parla)','Emperor (Villai Meen)'],
+  'Oven':       ['Seer (Vanjaram)','Baramudi (Koduva)','Tuna (Choora)','Emperor (Villai Meen)'],
+  'No oil/Steam':['Baramudi (Koduva)','Cod (Kalavan)','White Pomfret (Vella Vavval)','Tuna (Choora)'],
+  'Steam':      ['Baramudi (Koduva)','White Pomfret (Vella Vavval)','Cod (Kalavan)','Pink Perch (Sankara)'],
 };
 
 let meenaStep     = 0;

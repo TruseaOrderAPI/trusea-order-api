@@ -1018,48 +1018,46 @@ header {
 /* Typewriter effect */
 .typewriter { overflow: hidden; white-space: pre-wrap; }
 
-.meena-input-row {
+.meena-options-row {
   padding: 10px 16px;
-  padding-bottom: max(10px, env(safe-area-inset-bottom));
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
-  background: rgba(0,0,0,0.3);
+  justify-content: center;
+  background: rgba(0,0,0,0.35);
   backdrop-filter: blur(20px);
   border-top: 0.5px solid rgba(45,212,176,0.15);
   flex-shrink: 0;
+  min-height: 58px;
+  align-items: center;
 }
 
-.meena-input {
-  flex: 1;
-  background: rgba(255,255,255,0.07);
-  border: 0.5px solid rgba(255,255,255,0.15);
-  border-radius: 12px;
-  padding: 10px 14px;
+.meena-opt-btn {
+  background: rgba(45,212,176,0.12);
+  border: 0.5px solid rgba(45,212,176,0.35);
+  border-radius: 100px;
+  padding: 9px 18px;
   font-family: inherit;
-  font-size: 14px;
-  color: var(--text);
-  outline: none;
-  transition: border-color 0.15s;
-}
-
-.meena-input:focus { border-color: var(--teal); }
-.meena-input::placeholder { color: rgba(255,255,255,0.35); }
-
-.meena-send-btn {
-  width: 44px; height: 44px;
-  background: var(--teal);
-  border: none;
-  border-radius: 12px;
-  color: #0a1628;
-  font-size: 18px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #b8f0e8;
   cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: all 0.15s;
-  flex-shrink: 0;
+  transition: all 0.18s;
+  animation: optPop 0.28s cubic-bezier(0.34,1.56,0.64,1) both;
 }
 
-.meena-send-btn:hover { background: #22c4a0; transform: scale(1.05); }
-.meena-send-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+.meena-opt-btn:hover {
+  background: var(--teal);
+  color: #0a1628;
+  transform: scale(1.06);
+  border-color: var(--teal);
+}
+
+@keyframes optPop {
+  from { opacity:0; transform:scale(0.75) translateY(8px); }
+  to   { opacity:1; transform:scale(1) translateY(0); }
+}
 
 /* Recommended fish chips */
 .fish-chips {
@@ -1313,12 +1311,7 @@ header {
       </div>
     </div>
     <div class="meena-messages" id="meena-messages"></div>
-    <div class="meena-input-row">
-      <input class="meena-input" id="meena-input" type="text" 
-        placeholder="Tell me your preference…" 
-        onkeydown="if(event.key==='Enter')sendMeenaMsg()">
-      <button class="meena-send-btn" id="meena-send" onclick="sendMeenaMsg()">➤</button>
-    </div>
+    <div class="meena-options-row" id="meena-options"></div>
   </div>
 </div>
 
@@ -2200,9 +2193,11 @@ function toggleSearch() {
 }
 
 /* ══ MEENA RANI AI FISH ADVISOR ══════════════ */
-let meenaHistory = [];
-let meenaTyping  = false;
-let meenaAwaitingFishClick = false;
+
+/* ── CONFIG: Replace with your own image URL ──
+   MEENA_IMAGE_URL: Set to a direct image link (PNG/WebP, ideally transparent BG)
+   Leave as '' to use the default SVG mermaid character.                         */
+const MEENA_IMAGE_URL = ''; // ← PASTE YOUR IMAGE URL HERE
 
 const FISH_LIST = [
   'Seer (Vanjaram)','Barracuda (Seela)','Mackerel (Kanangathai)','Pink Perch (Sankara)',
@@ -2218,29 +2213,74 @@ const FISH_LIST = [
   'White Snapper (Korkkai)','Lobster','Rainbow Runner','Flathead Grey Mullet (Madavai Meen)'
 ];
 
-const MEENA_SYSTEM = `You are Meena Rani, TruSea Fish's beautiful sea angel AI assistant who helps customers choose the perfect fish.
-Personality: Warm, poetic, ocean-spirited. Use occasional ocean metaphors. Keep responses SHORT and FRIENDLY (max 4 lines).
-Fish list: ${FISH_LIST.join(', ')}
+/* Conversation flow — fully button driven, no typing */
+const MEENA_FLOW = [
+  {
+    key: 'purpose',
+    question: 'What is this meal for? 🌊',
+    options: [
+      { label: '🥗 Diet / Weight Loss', value: 'Diet/Weight loss' },
+      { label: '💪 Muscle Gain',        value: 'Muscle gain' },
+      { label: '❤️ Heart Health',       value: 'Heart health/Omega-3' },
+      { label: '👶 Kids',               value: 'Kids' },
+      { label: '👴 Elderly',            value: 'Elderly' },
+      { label: '🤰 Pregnancy',          value: 'Pregnancy' },
+      { label: '🍽️ Family Meal',        value: 'Family meal' },
+      { label: '🎉 Guests / Premium',   value: 'Guests/Premium' },
+      { label: '🎊 Festival',           value: 'Festival' },
+      { label: '🐟 Regular Cooking',    value: 'Regular cooking' },
+    ]
+  },
+  {
+    key: 'cooking',
+    question: 'How will you cook it? 🔥',
+    options: [
+      { label: '🍳 Fry',       value: 'Fry' },
+      { label: '🍛 Curry',     value: 'Curry' },
+      { label: '🔥 Grill',     value: 'Grill' },
+      { label: '🫕 Oven',      value: 'Oven' },
+      { label: '🫒 No Oil',    value: 'No oil/Steam' },
+      { label: '💨 Steam',     value: 'Steam' },
+    ]
+  },
+  {
+    key: 'taste',
+    question: 'What taste do you prefer? 😋',
+    options: [
+      { label: '🫧 Soft & Light',   value: 'Soft' },
+      { label: '🪨 Firm & Meaty',   value: 'Firm/Meaty' },
+      { label: '🌶️ Rich Flavor',    value: 'Rich flavor' },
+      { label: '🌿 Mild & Subtle',  value: 'Mild' },
+    ]
+  }
+];
 
-Step 1: Ask purpose (Diet/Weight loss/Muscle gain/Family meal/Guests/Kids/Elderly/Pregnancy/Festival/Regular cooking)
-Step 2: Ask cooking method (Fry/Curry/Grill/Oven/No oil/Steam)
-Step 3: Ask taste preference (Soft/Firm/Meaty/Rich flavor/Mild)
-Step 4: Recommend 2-4 fish using this logic:
-- Diet/Weight loss: Tuna, Rainbow Runner, Barramundi, Cod
-- Muscle gain: Seer, Tuna, Barracuda, Emperor
-- Heart health/Omega3: Sardines, Mackerel, Indian Salmon, Tuna
-- Kids: Sankara, White Pomfret, Barramundi, Croaker
-- Elderly: Pomfret, Sankara, Cod, Barramundi
-- Pregnancy: Sankara, Pomfret, Barramundi, Indian Salmon
-- Family meal: Sankara, Barramundi, Snapper, Croaker
-- Guests/Premium: Seer, Pomfret, Lobster, Tiger Prawns, Spot Grouper
-- Fry: Vanjaram, Barracuda, Croaker, Sankara, Anchovy
-- Curry: Sankara, Snapper, Barramundi, Mackerel, Sardines
-- Grill: Seer, Tuna, Barramundi, Mahi Mahi, Emperor
+/* Recommendation logic (local — no API needed) */
+const RECO = {
+  'Diet/Weight loss':    ['Tuna (Choora)','Rainbow Runner','Barramundi (Koduva)','Cod (Kalavan)'],
+  'Muscle gain':         ['Seer (Vanjaram)','Tuna (Choora)','Barracuda (Seela)','Emperor (Villai Meen)'],
+  'Heart health/Omega-3':['Sardines (Mathi)','Mackerel (Kanangathai)','Indian Salmon (Kala)','Tuna (Choora)'],
+  'Kids':                ['Pink Perch (Sankara)','White Pomfret (Vella Vavval)','Barramundi (Koduva)','Croaker (Panna)'],
+  'Elderly':             ['White Pomfret (Vella Vavval)','Black Pomfret (Karuppu Vavval)','Pink Perch (Sankara)','Barramundi (Koduva)'],
+  'Pregnancy':           ['Pink Perch (Sankara)','White Pomfret (Vella Vavval)','Barramundi (Koduva)','Indian Salmon (Kala)'],
+  'Family meal':         ['Pink Perch (Sankara)','Barramundi (Koduva)','Snapper (Manja Sankara)','Croaker (Panna)'],
+  'Guests/Premium':      ['Seer (Vanjaram)','White Pomfret (Vella Vavval)','Lobster','Tiger Prawns (Vari Iral)','Spot Grouper (Kalava)'],
+  'Festival':            ['Seer (Vanjaram)','White Pomfret (Vella Vavval)','Tiger Prawns (Vari Iral)','Lobster'],
+  'Regular cooking':     ['Pink Perch (Sankara)','Sardines (Mathi)','Mackerel (Kanangathai)','Croaker (Panna)'],
+};
 
-IMPORTANT: After recommendations, end with EXACTLY this JSON block on the last line (no extra text after):
-FISHCHIPS:["Fish Name 1","Fish Name 2","Fish Name 3"]
-Use exact names from the fish list. This triggers clickable fish buttons for the customer.`;
+const COOKING_RECO = {
+  'Fry':        ['Seer (Vanjaram)','Barracuda (Seela)','Croaker (Panna)','Pink Perch (Sankara)','Anchovy (Nethili)'],
+  'Curry':      ['Pink Perch (Sankara)','Snapper (Manja Sankara)','Barramundi (Koduva)','Mackerel (Kanangathai)','Sardines (Mathi)'],
+  'Grill':      ['Seer (Vanjaram)','Tuna (Choora)','Barramundi (Koduva)','Mahi Mahi (Parla)','Emperor (Villai Meen)'],
+  'Oven':       ['Seer (Vanjaram)','Barramundi (Koduva)','Tuna (Choora)','Emperor (Villai Meen)'],
+  'No oil/Steam':['Barramundi (Koduva)','Cod (Kalavan)','White Pomfret (Vella Vavval)','Tuna (Choora)'],
+  'Steam':      ['Barramundi (Koduva)','White Pomfret (Vella Vavval)','Cod (Kalavan)','Pink Perch (Sankara)'],
+};
+
+let meenaStep     = 0;
+let meenaAnswers  = {};
+let meenaTyping   = false;
 
 function openMeena() {
   const overlay = document.getElementById('meena-overlay');
@@ -2249,7 +2289,18 @@ function openMeena() {
     overlay.classList.add('open');
     requestAnimationFrame(() => overlay.classList.add('visible'));
   });
-  
+
+  // Apply custom image if set
+  const mermaidWrap = document.getElementById('meena-mermaid');
+  if (MEENA_IMAGE_URL) {
+    mermaidWrap.innerHTML = `
+      <div class="meena-glow-ring"></div>
+      <img src="${MEENA_IMAGE_URL}" class="meena-mermaid-svg"
+           style="object-fit:contain;border-radius:12px;"
+           alt="Meena Rani">
+    `;
+  }
+
   // Generate bubbles
   const bubbles = document.getElementById('meena-bubbles');
   bubbles.innerHTML = '';
@@ -2257,31 +2308,23 @@ function openMeena() {
     const b = document.createElement('div');
     b.className = 'bubble';
     const size = 4 + Math.random() * 16;
-    b.style.cssText = `
-      width:${size}px; height:${size}px;
-      left:${Math.random()*100}%;
-      bottom:${-size}px;
-      animation-duration:${4 + Math.random()*6}s;
-      animation-delay:${Math.random()*4}s;
-    `;
+    b.style.cssText = `width:${size}px;height:${size}px;left:${Math.random()*100}%;bottom:${-size}px;animation-duration:${4+Math.random()*6}s;animation-delay:${Math.random()*4}s;`;
     bubbles.appendChild(b);
   }
 
-  // Reset chat
-  meenaHistory = [];
-  meenaAwaitingFishClick = false;
+  // Reset state
+  meenaStep = 0;
+  meenaAnswers = {};
   document.getElementById('meena-messages').innerHTML = '';
+  document.getElementById('meena-options').innerHTML = '';
 
-  // Animate mermaid rising after short delay
+  // Rise mermaid then start
   setTimeout(() => {
     document.getElementById('meena-mermaid').classList.add('risen');
     setTimeout(() => {
-      // Show chat UI
       document.getElementById('meena-chat').classList.add('visible');
-      // Type intro message
-      const intro = 'Hello dear, welcome to TruSea Fish! I\'m "Meena Rani" 🧜‍♀️ your personal AI guide to the ocean\'s finest catch. What brings you to the sea today?';
-      addMeenaMsg(intro, 'agent', true);
-      meenaHistory.push({ role: 'assistant', content: intro });
+      const intro = 'Hello dear, welcome to TruSea Fish! 🧜‍♀️ I'm Meena Rani, your personal fish guide. Let me help you choose the perfect catch!';
+      addMeenaBotMsg(intro, () => askStep(0));
     }, 600);
   }, 400);
 
@@ -2300,154 +2343,161 @@ function closeMeena() {
   document.body.style.overflow = '';
 }
 
-function addMeenaMsg(text, role, typewriter = false) {
+function addMeenaBotMsg(text, onDone) {
   const msgs = document.getElementById('meena-messages');
-
-  // Check for fish chips in text
-  let fishChips = null;
-  let displayText = text;
-  const chipMatch = text.match(/FISHCHIPS:(\[.*?\])/);
-  if (chipMatch) {
-    try { fishChips = JSON.parse(chipMatch[1]); } catch(e) {}
-    displayText = text.replace(/FISHCHIPS:\[.*?\]/, '').trim();
-    meenaAwaitingFishClick = true;
-  }
-
   const div = document.createElement('div');
-  div.className = `meena-msg ${role}`;
+  div.className = 'meena-msg agent';
+  div.textContent = '';
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
 
-  if (typewriter && role === 'agent') {
-    div.textContent = '';
-    msgs.appendChild(div);
-    msgs.scrollTop = msgs.scrollHeight;
-    let i = 0;
-    const speed = 18;
-    function type() {
-      if (i < displayText.length) {
-        div.textContent += displayText[i++];
-        msgs.scrollTop = msgs.scrollHeight;
-        setTimeout(type, speed);
-      } else if (fishChips) {
-        addFishChips(fishChips, msgs);
-      }
+  let i = 0;
+  function type() {
+    if (i < text.length) {
+      div.textContent += text[i++];
+      msgs.scrollTop = msgs.scrollHeight;
+      setTimeout(type, 16);
+    } else if (onDone) {
+      setTimeout(onDone, 180);
     }
-    setTimeout(type, 10);
-  } else {
-    div.textContent = displayText;
-    msgs.appendChild(div);
-    if (fishChips) addFishChips(fishChips, msgs);
-    msgs.scrollTop = msgs.scrollHeight;
   }
+  type();
 }
 
-function addFishChips(chips, msgs) {
-  const chipRow = document.createElement('div');
-  chipRow.className = 'fish-chips';
-  chips.forEach((fish, i) => {
-    const chip = document.createElement('button');
-    chip.className = 'fish-chip';
-    chip.textContent = '🐟 ' + fish;
-    chip.style.animationDelay = (i * 0.08) + 's';
-    chip.onclick = () => onFishChipClick(fish);
-    chipRow.appendChild(chip);
-  });
-  msgs.appendChild(chipRow);
+function addMeenaUserMsg(text) {
+  const msgs = document.getElementById('meena-messages');
+  const div = document.createElement('div');
+  div.className = 'meena-msg user';
+  div.textContent = text;
+  msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
+}
+
+function askStep(stepIdx) {
+  if (stepIdx >= MEENA_FLOW.length) {
+    showRecommendations();
+    return;
+  }
+  const step = MEENA_FLOW[stepIdx];
+  addMeenaBotMsg(step.question, () => {
+    showOptions(step.options, (val, label) => {
+      addMeenaUserMsg(label);
+      meenaAnswers[step.key] = val;
+      document.getElementById('meena-options').innerHTML = '';
+      askStep(stepIdx + 1);
+    });
+  });
+}
+
+function showOptions(options, onSelect) {
+  const row = document.getElementById('meena-options');
+  row.innerHTML = '';
+  options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'meena-opt-btn';
+    btn.textContent = opt.label;
+    btn.style.animationDelay = (i * 0.06) + 's';
+    btn.onclick = () => {
+      // Disable all buttons immediately
+      row.querySelectorAll('.meena-opt-btn').forEach(b => b.disabled = true);
+      onSelect(opt.value, opt.label);
+    };
+    row.appendChild(btn);
+  });
+}
+
+function showRecommendations() {
+  const { purpose, cooking, taste } = meenaAnswers;
+
+  // Intersect purpose + cooking recommendations
+  const byPurpose  = RECO[purpose]  || [];
+  const byCooking  = COOKING_RECO[cooking] || [];
+
+  // Find overlap; if none, merge and pick top 3
+  let picks = byPurpose.filter(f => byCooking.includes(f));
+  if (picks.length < 2) picks = [...new Set([...byPurpose, ...byCooking])].slice(0, 4);
+  picks = picks.slice(0, 4);
+
+  const cookingLabel = cooking.replace('/', ' / ');
+  const msg = `Based on your choices, here are the best fish for you:
+
+${picks.map((f,i)=>`${['🥇','🥈','🥉','🐟'][i]} ${f}`).join('
+')}
+
+Best for ${cookingLabel}. Tap a fish to see it! 👇`;
+
+  addMeenaBotMsg(msg, () => {
+    addFishChips(picks);
+  });
+}
+
+function addFishChips(chips) {
+  const msgs = document.getElementById('meena-messages');
+  const row = document.createElement('div');
+  row.className = 'fish-chips';
+  chips.forEach((fish, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'fish-chip';
+    btn.textContent = '🐟 ' + fish;
+    btn.style.animationDelay = (i * 0.08) + 's';
+    btn.onclick = () => onFishChipClick(fish);
+    row.appendChild(btn);
+  });
+  msgs.appendChild(row);
+  msgs.scrollTop = msgs.scrollHeight;
+
+  // Show restart option
+  const optRow = document.getElementById('meena-options');
+  optRow.innerHTML = '';
+  const restartBtn = document.createElement('button');
+  restartBtn.className = 'meena-opt-btn';
+  restartBtn.textContent = '🔄 Start Over';
+  restartBtn.style.animationDelay = '0.3s';
+  restartBtn.onclick = () => {
+    meenaStep = 0;
+    meenaAnswers = {};
+    document.getElementById('meena-messages').innerHTML = '';
+    optRow.innerHTML = '';
+    const intro = 'Let's find you another perfect catch! 🌊';
+    addMeenaBotMsg(intro, () => askStep(0));
+  };
+  optRow.appendChild(restartBtn);
 }
 
 function onFishChipClick(fishName) {
   closeMeena();
-  // Find the fish card and scroll to it
   setTimeout(() => {
-    // Search by fish name
     searchQ = '';
     activeFilter = 'all';
     document.querySelectorAll('.pill').forEach(p => p.classList.remove('on'));
     document.querySelector('.pill').classList.add('on');
-    
-    // Try to find matching card
-    const allCards = document.querySelectorAll('.card');
-    let found = null;
-    for (const card of allCards) {
-      const nameEl = card.querySelector('.card-name');
-      if (nameEl && nameEl.textContent.toLowerCase().includes(fishName.toLowerCase().split('(')[0].trim().toLowerCase())) {
-        found = card;
-        break;
+    render();
+
+    setTimeout(() => {
+      const allCards = document.querySelectorAll('.card');
+      let found = null;
+      for (const card of allCards) {
+        const nameEl = card.querySelector('.card-name');
+        if (nameEl && nameEl.textContent.toLowerCase().includes(
+          fishName.toLowerCase().split('(')[0].trim()
+        )) { found = card; break; }
       }
-    }
-    if (found) {
-      found.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      // Highlight effect
-      found.style.transition = 'box-shadow 0.3s, border-color 0.3s';
-      found.style.boxShadow = '0 0 0 3px rgba(45,212,176,0.7), 0 12px 40px rgba(45,212,176,0.4)';
-      found.style.borderColor = 'var(--teal)';
-      setTimeout(() => {
-        found.style.boxShadow = '';
-        found.style.borderColor = '';
-      }, 2500);
-    } else {
-      // Search for it
-      const input = document.getElementById('search-input');
-      const cleanName = fishName.split('(')[0].trim();
-      if (input) {
-        input.classList.add('open');
-        input.value = cleanName;
-        doSearch(cleanName);
+      if (found) {
+        found.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        found.style.transition = 'box-shadow 0.3s, border-color 0.3s';
+        found.style.boxShadow  = '0 0 0 3px rgba(45,212,176,0.7), 0 12px 40px rgba(45,212,176,0.4)';
+        found.style.borderColor = 'var(--teal)';
+        setTimeout(() => { found.style.boxShadow = ''; found.style.borderColor = ''; }, 2500);
+      } else {
+        const input = document.getElementById('search-input');
+        const clean = fishName.split('(')[0].trim();
+        if (input) { input.classList.add('open'); input.value = clean; doSearch(clean); }
       }
-    }
-  }, 500);
+    }, 200);
+  }, 450);
 }
 
-async function sendMeenaMsg() {
-  if (meenaTyping) return;
-  const input = document.getElementById('meena-input');
-  const text = input.value.trim();
-  if (!text) return;
-  
-  input.value = '';
-  addMeenaMsg(text, 'user');
-  meenaHistory.push({ role: 'user', content: text });
-
-  // Show typing indicator
-  const msgs = document.getElementById('meena-messages');
-  const typingDiv = document.createElement('div');
-  typingDiv.className = 'meena-typing';
-  typingDiv.id = 'meena-typing-indicator';
-  typingDiv.innerHTML = '<span></span><span></span><span></span>';
-  msgs.appendChild(typingDiv);
-  msgs.scrollTop = msgs.scrollHeight;
-
-  meenaTyping = true;
-  document.getElementById('meena-send').disabled = true;
-
-  try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: 'claude-sonnet-4-20250514',
-        max_tokens: 400,
-        system: MEENA_SYSTEM,
-        messages: meenaHistory
-      })
-    });
-    const data = await res.json();
-    const reply = data.content?.[0]?.text || 'The ocean whispers… please try again 🌊';
-    
-    // Remove typing indicator
-    document.getElementById('meena-typing-indicator')?.remove();
-    
-    meenaHistory.push({ role: 'assistant', content: reply });
-    addMeenaMsg(reply, 'agent', true);
-  } catch(e) {
-    document.getElementById('meena-typing-indicator')?.remove();
-    addMeenaMsg('The ocean waves interrupted us 🌊 Please try again!', 'agent');
-  }
-
-  meenaTyping = false;
-  document.getElementById('meena-send').disabled = false;
-}
-
+/* ══ INIT ═══════════════════════════ */
 /* ══ INIT ═══════════════════════════ */
 load();
 setInterval(load, 15 * 60 * 1000); // refresh every 15 min

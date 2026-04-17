@@ -721,34 +721,31 @@ header {
 .cfg-box strong { display: block; margin-bottom: 3px; font-size: 13.5px; }
 .cfg-box code { background: rgba(0,0,0,0.3); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
 
-@media (max-width: 520px) {
-  .catalog { grid-template-columns: 1fr; gap: 12px; padding: 10px 12px 150px; }
-  .controls { padding: 14px 12px 4px; }
-  .input-row { flex-direction: column; }
-  .header-inner { padding: 0 14px; }
+/* ── Slice variant buttons (Large/Medium Slices) ── */
+.slice-variant-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
 }
-</style>
-</head>
-<body>
 
-<!-- ════════════ HEADER ════════════ -->
-<header>
-  <div class="header-inner">
-    <div class="logo-wrap">
-      <img
-        class="logo-img"
-        src="https://drive.google.com/thumbnail?id=1SyzEf3LSoQx12Unx7-cZ8wwrdkAFP1I_&sz=h120"
-        alt="TruSea Fish"
-        onerror="this.style.display='none';document.getElementById('logo-fallback').style.display='block'"
-      >
-      <div class="logo-text" id="logo-fallback" style="display:none">Tru<em>Sea</em> Fish</div>
-    </div>
-    <div class="live-pill">
-      <div class="pulse"></div>
-      <span id="updated-time">Loading stock…</span>
-    </div>
-  </div>
-</header>
+.slice-var-btn {
+  background: var(--glass);
+  border: 0.5px solid var(--glass-border);
+  border-radius: 100px;
+  padding: 5px 13px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.2px;
+  text-transform: uppercase;
+}
+
+.slice-var-btn:hover { background: var(--glass-hover); color: var(--text); }
+.slice-var-btn.sel   { background: rgba(45,212,176,0.18); border-color: var(--teal); color: var(--teal); }
 
 <!-- ════════════ HERO ════════════ -->
 <div class="hero">
@@ -772,9 +769,10 @@ header {
   <button class="pill" onclick="setFilter('in',this)">✓ In Stock</button>
   <button class="pill" onclick="setFilter('out',this)">📋 Pre-Book</button>
   <div class="search-wrap">
-  <input class="search" id="search-input" type="text" 
-    placeholder="Search fish…" oninput="doSearch(this.value)">
-  <div class="search-toggle" onclick="toggleSearch()">🔍</div>
+    <input class="search" id="search-input" type="text" 
+      placeholder="Search fish…" oninput="doSearch(this.value)">
+    <div class="search-toggle" onclick="toggleSearch()">🔍</div>
+  </div>
 </div>
 
 <!-- ════════════ CATALOG ════════════ -->
@@ -916,27 +914,33 @@ function parseCSV(csv) {
 }
 
 function groupProducts(rows) {
-  // Group by Name + Variant (same name+variant = same card, multiple weight options)
-  // Actually: same Name + Variant = one card, different Gross/Net = weight options within
-  // But from sheet: each row is a distinct weight option for that Name+Variant combo
-  const map = new Map();
+  // Group by Name only — same fish name = one card
+  // Within each name, group by variant (Large Slices, Medium Slices, etc.)
+  // Within each variant, multiple weight options (500g, 1kg)
+  const nameMap = new Map();
   rows.forEach(r => {
-    const key = r.name + '||' + r.variant;
-    if (!map.has(key)) {
-      map.set(key, {
-        id:       key.replace(/[^a-zA-Z0-9]/g,'_'),
+    const nameKey = r.name;
+    if (!nameMap.has(nameKey)) {
+      nameMap.set(nameKey, {
+        id:       nameKey.replace(/[^a-zA-Z0-9]/g,'_'),
         name:     r.name,
         type:     r.type,
         category: r.category,
-        variant:  r.variant,
         imageUrl: r.imageUrl,
         idealFor: r.idealFor,
         addonPrice: r.addonPrice,
         extraPPP:   r.extraPPP,
-        weights: []
+        sliceVariants: [] // [{variant, weights:[]}]
       });
     }
-    map.get(key).weights.push({
+    const card = nameMap.get(nameKey);
+    // find or create sliceVariant group
+    let sv = card.sliceVariants.find(s => s.variant === r.variant);
+    if (!sv) {
+      sv = { variant: r.variant, weights: [] };
+      card.sliceVariants.push(sv);
+    }
+    sv.weights.push({
       gross:   r.gross,
       net:     r.net,
       pieces:  r.pieces,
@@ -946,8 +950,10 @@ function groupProducts(rows) {
       inStock: r.inStock,
       sizeVariant: r.sizeVariant,
     });
+    // update imageUrl if this row has one and card doesn't yet
+    if (!card.imageUrl && r.imageUrl) card.imageUrl = r.imageUrl;
   });
-  return Array.from(map.values());
+  return Array.from(nameMap.values());
 }
   
   function scrollToTop() {
@@ -975,13 +981,13 @@ function render() {
   let list = groups;
 
   if (activeFilter === 'in')
-    list = list.filter(g => g.weights.some(w => w.inStock));
+    list = list.filter(g => g.sliceVariants.some(sv => sv.weights.some(w => w.inStock)));
   if (activeFilter === 'out')
-    list = list.filter(g => g.weights.every(w => !w.inStock));
+    list = list.filter(g => g.sliceVariants.every(sv => sv.weights.every(w => !w.inStock)));
   if (searchQ)
     list = list.filter(g =>
       g.name.toLowerCase().includes(searchQ) ||
-      g.variant.toLowerCase().includes(searchQ) ||
+      g.sliceVariants.some(sv => sv.variant.toLowerCase().includes(searchQ)) ||
       g.category.toLowerCase().includes(searchQ)
     );
 
@@ -1005,22 +1011,34 @@ function render() {
 function cardHTML(g, gi) {
   const isFish    = g.type.toLowerCase() === 'fish';
   const isBigFish = g.category.toLowerCase().includes('big');
-  const firstW    = g.weights[0];
-  const allOOS    = g.weights.every(w => !w.inStock);
   const cardId    = `card_${gi}`;
 
-  // Weight variant buttons
-  const varButtons = g.weights.map((w, wi) => `
-  <button
-    class="var-btn ${wi===0?'sel':''} ${!w.inStock?'oos-v':''}"
-    onclick="selectVariant('${cardId}',${wi})"
-    ${!w.inStock?'title="Out of Stock"':''}
-  >
-    ${w.sizeVariant || 'Standard'}
-  </button>
-`).join('');
+  // Default selected slice variant = first
+  const firstSV   = g.sliceVariants[0];
+  const firstW    = firstSV.weights[0];
+  const allOOS    = g.sliceVariants.every(sv => sv.weights.every(w => !w.inStock));
 
-  // Addon row (Head & Tail) — only for Fish type
+  // Slice variant buttons (Large Slices, Medium Slices, etc.)
+  const hasMultiVariants = g.sliceVariants.length > 1;
+  const sliceButtons = hasMultiVariants ? g.sliceVariants.map((sv, svi) => `
+    <button
+      class="slice-var-btn ${svi===0?'sel':''}"
+      onclick="selectSliceVariant('${cardId}',${svi})"
+    >${sv.variant}</button>
+  `).join('') : '';
+
+  // Weight buttons for first slice variant
+  const weightButtons = firstSV.weights.map((w, wi) => `
+    <button
+      class="var-btn ${wi===0?'sel':''} ${!w.inStock?'oos-v':''}"
+      onclick="selectWeight('${cardId}',${wi})"
+      ${!w.inStock?'title="Out of Stock"':''}
+    >
+      ${w.sizeVariant || 'Standard'}
+    </button>
+  `).join('');
+
+  // Addon row
   const addonRow = isFish && g.addonPrice > 0 ? `
     <label class="addon-row" for="${cardId}_addon">
       <input class="addon-cb" type="checkbox" id="${cardId}_addon"
@@ -1030,7 +1048,7 @@ function cardHTML(g, gi) {
     </label>
   ` : '';
 
-  // Extra pieces — only for Big Fish
+  // Extra pieces
   const extraRow = isBigFish && g.extraPPP > 0 ? `
     <div class="extra-section">
       <label class="extra-toggle" for="${cardId}_extra">
@@ -1048,12 +1066,8 @@ function cardHTML(g, gi) {
     </div>
   ` : '';
 
-  // Ideal for
-  const idealRow = g.idealFor ? `
-    <div class="ideal-row"><strong>Ideal for:</strong> ${g.idealFor}</div>
-  ` : '';
+  const idealRow = g.idealFor ? `<div class="ideal-row"><strong>Ideal for:</strong> ${g.idealFor}</div>` : '';
 
-  // Image
   const imgHTML = g.imageUrl
     ? `<img class="card-img" src="${g.imageUrl}" alt="${g.name}"
          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
@@ -1071,22 +1085,26 @@ function cardHTML(g, gi) {
 
     <div class="card-body">
       <div class="card-name">${g.name}</div>
-      <div class="card-variant-label">${g.variant}</div>
 
-      <!-- Dynamic specs — updates with variant selection -->
+      <!-- Slice variant buttons (Large/Medium Slices) -->
+      ${hasMultiVariants ? `
+        <div class="slice-variant-row" id="${cardId}_svbtns">${sliceButtons}</div>
+      ` : `<div class="card-variant-label">${firstSV.variant}</div>`}
+
+      <!-- Dynamic specs -->
       <div class="specs" id="${cardId}_specs">
         ${specsHTML(firstW)}
       </div>
 
-      <!-- Weight variant selector -->
-      ${g.weights.length > 1 ? `
+      <!-- Weight selector -->
+      ${firstSV.weights.length > 1 ? `
         <div class="variant-section">
           <div class="variant-label-row">Select Weight</div>
           <div class="variant-buttons" id="${cardId}_vbtns">
-            ${varButtons}
+            ${weightButtons}
           </div>
         </div>
-      ` : ''}
+      ` : `<div class="variant-buttons" id="${cardId}_vbtns" style="display:none">${weightButtons}</div>`}
 
       <!-- Price -->
       <div class="price-row">
@@ -1100,7 +1118,6 @@ function cardHTML(g, gi) {
 
       <div class="delivery-row"><strong>Delivery time:</strong> ${allOOS ? 'Ships as soon as available' : 'Immediately available'}</div>
 
-      <!-- Footer -->
       <div class="card-footer">
         <div class="qty-ctrl" id="${cardId}_qty">
           <button class="qc-btn" onclick="changeQty('${cardId}',-1)">−</button>
@@ -1118,30 +1135,87 @@ function cardHTML(g, gi) {
 
 function specsHTML(w) {
   const parts = [];
-  if (w.pieces)  parts.push(`<span class="spec-item"><span class="spec-label">Pieces / Slices:</span><span class="spec-val">${w.pieces}</span></span>`);
   if (w.gross)   parts.push(`<span class="spec-item"><span class="spec-label">Gross:</span><span class="spec-val">${w.gross}</span></span>`);
   if (w.net)     parts.push(`<span class="spec-item"><span class="spec-label">Net:</span><span class="spec-val">${w.net}</span></span>`);
+  if (w.pieces)  parts.push(`<span class="spec-item"><span class="spec-label">Pieces:</span><span class="spec-val">${w.pieces}</span></span>`);
   if (w.serves)  parts.push(`<span class="spec-item"><span class="spec-label">Serves:</span><span class="spec-val">${w.serves}</span></span>`);
   if (w.cutSize) parts.push(`<span class="spec-item"><span class="spec-label">Cut:</span><span class="spec-val">${w.cutSize}</span></span>`);
   return parts.join('');
 }
 
-/* ══ VARIANT SELECTION ══════════════ */
-// Store selected variant index per card
-const selVariant = {};
+/* ══ SLICE VARIANT & WEIGHT SELECTION ══════════════ */
+const selSliceVariant = {}; // cardId -> sliceVariant index
+const selVariant = {};      // cardId -> weight index within current slice variant
 
-function selectVariant(cardId, wi) {
+function getCurrentSV(cardId, g) {
+  const svi = selSliceVariant[cardId] || 0;
+  return g.sliceVariants[svi];
+}
+
+function getCurrentW(cardId, g) {
+  const sv = getCurrentSV(cardId, g);
+  const wi = selVariant[cardId] || 0;
+  return sv.weights[wi] || sv.weights[0];
+}
+
+function selectSliceVariant(cardId, svi) {
   const g = getGroupByCardId(cardId);
   if (!g) return;
-  const w = g.weights[wi];
+  selSliceVariant[cardId] = svi;
+  selVariant[cardId] = 0; // reset weight selection
 
+  const sv = g.sliceVariants[svi];
+  const w  = sv.weights[0];
+
+  // Update slice variant buttons
+  document.querySelectorAll(`#${cardId}_svbtns .slice-var-btn`).forEach((b, i) =>
+    b.classList.toggle('sel', i === svi));
+
+  // Rebuild weight buttons
+  const vbtnsEl = document.getElementById(cardId + '_vbtns');
+  if (vbtnsEl) {
+    if (sv.weights.length > 1) {
+      vbtnsEl.style.display = '';
+      vbtnsEl.innerHTML = sv.weights.map((ww, wi) => `
+        <button class="var-btn ${wi===0?'sel':''} ${!ww.inStock?'oos-v':''}"
+          onclick="selectWeight('${cardId}',${wi})"
+          ${!ww.inStock?'title="Out of Stock"':''}>
+          ${ww.sizeVariant || 'Standard'}
+        </button>
+      `).join('');
+    } else {
+      vbtnsEl.style.display = 'none';
+    }
+  }
+
+  // Show variant section wrapper only if needed
+  const varSection = vbtnsEl?.closest('.variant-section');
+  if (varSection) varSection.style.display = sv.weights.length > 1 ? '' : 'none';
+
+  updateSpecsAndStock(cardId, g, w);
+  updatePrice(cardId);
+}
+
+function selectWeight(cardId, wi) {
+  const g = getGroupByCardId(cardId);
+  if (!g) return;
   selVariant[cardId] = wi;
 
-  // Update specs
-  document.getElementById(cardId + '_specs').innerHTML = specsHTML(w);
+  const sv = getCurrentSV(cardId, g);
+  const w  = sv.weights[wi];
 
-  // Update price display
+  // Update weight buttons
+  const btns = document.querySelectorAll(`#${cardId}_vbtns .var-btn`);
+  btns.forEach((b, i) => b.classList.toggle('sel', i === wi));
+
+  updateSpecsAndStock(cardId, g, w);
   updatePrice(cardId);
+}
+
+function updateSpecsAndStock(cardId, g, w) {
+  // Update specs
+  const specsEl = document.getElementById(cardId + '_specs');
+  if (specsEl) specsEl.innerHTML = specsHTML(w);
 
   // Update stock tag
   const tag = document.getElementById(cardId + '_stag');
@@ -1152,12 +1226,12 @@ function selectVariant(cardId, wi) {
 
   // Update add button
   const btn = document.getElementById(cardId + '_addbtn');
-  if (btn) {
+  if (btn && !btn.classList.contains('added')) {
     btn.disabled = false;
     if (!w.inStock) {
       btn.textContent = '📋 Pre-Book';
       btn.classList.add('prebook-btn');
-    } else if (!btn.classList.contains('added')) {
+    } else {
       btn.textContent = 'Add';
       btn.classList.remove('prebook-btn');
     }
@@ -1166,11 +1240,10 @@ function selectVariant(cardId, wi) {
   // Update card oos class
   const card = document.getElementById(cardId);
   if (card) card.classList.toggle('oos', !w.inStock);
-
-  // Highlight selected button
-  const btns = document.querySelectorAll(`#${cardId}_vbtns .var-btn`);
-  btns.forEach((b, i) => b.classList.toggle('sel', i === wi));
 }
+
+// Backward-compat alias
+function selectVariant(cardId, wi) { selectWeight(cardId, wi); }
 
 function getGroupByCardId(cardId) {
   const idx = parseInt(cardId.replace('card_',''));
@@ -1189,11 +1262,11 @@ function getGroupByCardId(cardId) {
 
 function getFilteredGroups() {
   let list = groups;
-  if (activeFilter === 'in')  list = list.filter(g => g.weights.some(w => w.inStock));
-  if (activeFilter === 'out') list = list.filter(g => g.weights.every(w => !w.inStock));
+  if (activeFilter === 'in')  list = list.filter(g => g.sliceVariants.some(sv => sv.weights.some(w => w.inStock)));
+  if (activeFilter === 'out') list = list.filter(g => g.sliceVariants.every(sv => sv.weights.every(w => !w.inStock)));
   if (searchQ) list = list.filter(g =>
     g.name.toLowerCase().includes(searchQ) ||
-    g.variant.toLowerCase().includes(searchQ) ||
+    g.sliceVariants.some(sv => sv.variant.toLowerCase().includes(searchQ)) ||
     g.category.toLowerCase().includes(searchQ)
   );
   return list;
@@ -1203,8 +1276,7 @@ function getFilteredGroups() {
 function updatePrice(cardId) {
   const g = getGroupByCardId(cardId);
   if (!g) return;
-  const wi = selVariant[cardId] || 0;
-  const w  = g.weights[wi];
+  const w = getCurrentW(cardId, g);
   let total = w.price;
 
   const addonCb = document.getElementById(cardId + '_addon');
@@ -1245,8 +1317,10 @@ const qtyVals = {};
 function addToCart(cardId) {
   const g = getGroupByCardId(cardId);
   if (!g) return;
-  const wi = selVariant[cardId] || 0;
-  const w  = g.weights[wi];
+  const svi = selSliceVariant[cardId] || 0;
+  const wi  = selVariant[cardId] || 0;
+  const sv  = g.sliceVariants[svi];
+  const w   = sv.weights[wi];
   const isPreBook = !w.inStock;
 
   const addonCb  = document.getElementById(cardId + '_addon');
@@ -1260,9 +1334,9 @@ function addToCart(cardId) {
     + (addonOn ? g.addonPrice : 0)
     + (extraOn ? extraQty * g.extraPPP : 0);
 
-  const key = cardId + '_' + wi;
-  const label = `${g.name} – ${g.variant} (${w.gross} / Net ${w.net})`;
-  const details = []
+  const key = cardId + '_' + svi + '_' + wi;
+  const label = `${g.name} – ${sv.variant} (${w.gross} / Net ${w.net})`;
+  const details = [];
   if (addonOn) details.push(`Head & Tail +₹${g.addonPrice}`);
   if (extraOn) details.push(`${extraQty} extra piece(s) +₹${extraQty * g.extraPPP}`);
 
@@ -1279,12 +1353,10 @@ function addToCart(cardId) {
     };
   }
 
-  // Show qty control, hide add btn
   const btn = document.getElementById(cardId + '_addbtn');
   const qc  = document.getElementById(cardId + '_qty');
   if (btn) { btn.style.display = 'none'; }
   if (qc)  { qc.classList.add('show'); }
-  qtyVals[key] = cart[key].qty;
   const qval = document.getElementById(cardId + '_qval');
   if (qval) qval.textContent = cart[key].qty;
 
@@ -1292,8 +1364,9 @@ function addToCart(cardId) {
 }
 
 function changeQty(cardId, delta) {
+  const svi = selSliceVariant[cardId] || 0;
   const wi  = selVariant[cardId] || 0;
-  const key = cardId + '_' + wi;
+  const key = cardId + '_' + svi + '_' + wi;
   if (!cart[key]) return;
   cart[key].qty = Math.max(0, cart[key].qty + delta);
   const qval = document.getElementById(cardId + '_qval');
@@ -1305,10 +1378,8 @@ function changeQty(cardId, delta) {
     const qc  = document.getElementById(cardId + '_qty');
     if (btn) { btn.style.display = ''; btn.textContent = 'Add'; }
     if (qc)  { qc.classList.remove('show'); }
-    // Re-enable extra when removed from cart
     syncExtraState(cardId, 1);
   } else {
-    // qty >= 2 → disable extra pieces
     syncExtraState(cardId, cart[key].qty);
   }
 
@@ -1322,31 +1393,28 @@ function syncExtraState(cardId, qty) {
   if (!extraCb) return;
 
   if (qty >= 2) {
-    // Disable + uncheck + hide counter
     extraCb.checked  = false;
     extraCb.disabled = true;
     if (extraEc) extraEc.classList.remove('show');
 
-    // Update cart item — remove extra from price/details
+    const svi = selSliceVariant[cardId] || 0;
     const wi  = selVariant[cardId] || 0;
-    const key = cardId + '_' + wi;
+    const key = cardId + '_' + svi + '_' + wi;
     if (cart[key] && cart[key].extraOn) {
       const g         = getGroupByCardId(cardId);
-      const w         = g?.weights[wi];
+      const sv        = g?.sliceVariants[svi];
+      const w         = sv?.weights[wi];
       const addonCb   = document.getElementById(cardId + '_addon');
       const addonOn   = addonCb?.checked || cart[key].addonOn;
-      // Recalc unit price without extra
       cart[key].extraOn   = false;
       cart[key].extraQty  = 0;
       cart[key].unitPrice = (w?.price || cart[key].basePrice)
                           + (addonOn ? (g?.addonPrice || 0) : 0);
-      // Rebuild details string
       const details = [];
       if (addonOn && g?.addonPrice) details.push(`Head & Tail +₹${g.addonPrice}`);
       cart[key].details = details.join(', ');
     }
 
-    // Visual feedback on the toggle row
     const toggle = extraCb.closest('.extra-toggle');
     if (toggle) {
       toggle.style.opacity = '0.4';
@@ -1354,7 +1422,6 @@ function syncExtraState(cardId, qty) {
       toggle.title = 'Extra pieces only available for Qty 1';
     }
   } else {
-    // Re-enable
     extraCb.disabled = false;
     const toggle = extraCb.closest('.extra-toggle');
     if (toggle) {

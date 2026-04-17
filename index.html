@@ -327,6 +327,34 @@ header {
 .variant-label-row { font-size: 10px; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text2); font-weight: 700; margin-bottom: 7px; }
 .variant-buttons { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); gap: 6px; }
 
+/* Size variant (Large/Medium) — compact pill style */
+.size-variant-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 6px;
+  margin-bottom: 2px;
+}
+
+.size-var-btn {
+  background: var(--glass);
+  border: 0.5px solid var(--glass-border);
+  border-radius: 100px;
+  padding: 5px 14px;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text2);
+  cursor: pointer;
+  transition: all 0.15s;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.size-var-btn:hover { background: var(--glass-hover); color: var(--text); border-color: var(--teal); }
+.size-var-btn.sel   { background: rgba(45,212,176,0.15); border-color: var(--teal); color: var(--teal); }
+.size-var-btn.oos-v { opacity: 0.4; cursor: not-allowed; }
+
 .var-btn {
   background: var(--glass);
   border: 0.5px solid var(--glass-border);
@@ -916,38 +944,49 @@ function parseCSV(csv) {
 }
 
 function groupProducts(rows) {
-  // Group by Name + Variant (same name+variant = same card, multiple weight options)
-  // Actually: same Name + Variant = one card, different Gross/Net = weight options within
-  // But from sheet: each row is a distinct weight option for that Name+Variant combo
+  // Group by Name only — same product title = one card
+  // Variant (Large Slices / Medium Slices) shown as size variant buttons
   const map = new Map();
   rows.forEach(r => {
-    const key = r.name + '||' + r.variant;
+    const key = r.name;
     if (!map.has(key)) {
       map.set(key, {
-        id:       key.replace(/[^a-zA-Z0-9]/g,'_'),
-        name:     r.name,
-        type:     r.type,
-        category: r.category,
-        variant:  r.variant,
-        imageUrl: r.imageUrl,
-        idealFor: r.idealFor,
+        id:         key.replace(/[^a-zA-Z0-9]/g,'_'),
+        name:       r.name,
+        type:       r.type,
+        category:   r.category,
+        imageUrl:   r.imageUrl,
+        idealFor:   r.idealFor,
         addonPrice: r.addonPrice,
         extraPPP:   r.extraPPP,
-        weights: []
+        variants:   [],  // [{variant, weights:[...]}]
       });
     }
-    map.get(key).weights.push({
-      gross:   r.gross,
-      net:     r.net,
-      pieces:  r.pieces,
-      serves:  r.serves,
-      cutSize: r.cutSize,
-      price:   r.price,
-      inStock: r.inStock,
+    const group = map.get(key);
+    // Find or create variant slot
+    let vslot = group.variants.find(v => v.variant === r.variant);
+    if (!vslot) {
+      vslot = { variant: r.variant, weights: [] };
+      group.variants.push(vslot);
+    }
+    vslot.weights.push({
+      gross:       r.gross,
+      net:         r.net,
+      pieces:      r.pieces,
+      serves:      r.serves,
+      cutSize:     r.cutSize,
+      price:       r.price,
+      inStock:     r.inStock,
       sizeVariant: r.sizeVariant,
     });
   });
-  return Array.from(map.values());
+  // Flatten to old format but carry variants info
+  return Array.from(map.values()).map(g => ({
+    ...g,
+    // active variant index — default 0
+    variant:    g.variants[0]?.variant || '',
+    weights:    g.variants[0]?.weights || [],
+  }));
 }
   
   function scrollToTop() {
@@ -1006,19 +1045,28 @@ function cardHTML(g, gi) {
   const isFish    = g.type.toLowerCase() === 'fish';
   const isBigFish = g.category.toLowerCase().includes('big');
   const firstW    = g.weights[0];
-  const allOOS    = g.weights.every(w => !w.inStock);
+  const allOOS    = g.variants.every(v => v.weights.every(w => !w.inStock));
   const cardId    = `card_${gi}`;
 
-  // Weight variant buttons
+  // Size variant buttons (Large Slices / Medium Slices etc)
+  const sizeVarButtons = g.variants.length > 1 ? g.variants.map((v, vi) => {
+    const vOOS = v.weights.every(w => !w.inStock);
+    return `<button
+      class="size-var-btn ${vi===0?'sel':''} ${vOOS?'oos-v':''}"
+      onclick="selectSizeVariant('${cardId}',${vi})"
+    >${v.variant}</button>`;
+  }).join('') : '';
+
+  // Weight variant buttons (500g / 1kg)
   const varButtons = g.weights.map((w, wi) => `
-  <button
-    class="var-btn ${wi===0?'sel':''} ${!w.inStock?'oos-v':''}"
-    onclick="selectVariant('${cardId}',${wi})"
-    ${!w.inStock?'title="Out of Stock"':''}
-  >
-    ${w.sizeVariant || 'Standard'}
-  </button>
-`).join('');
+    <button
+      class="var-btn ${wi===0?'sel':''} ${!w.inStock?'oos-v':''}"
+      onclick="selectVariant('${cardId}',${wi})"
+      ${!w.inStock?'title="Out of Stock"':''}
+    >
+      ${w.sizeVariant || 'Standard'}
+    </button>
+  `).join('');
 
   // Addon row (Head & Tail) — only for Fish type
   const addonRow = isFish && g.addonPrice > 0 ? `
@@ -1048,19 +1096,17 @@ function cardHTML(g, gi) {
     </div>
   ` : '';
 
-  // Ideal for
   const idealRow = g.idealFor ? `
     <div class="ideal-row"><strong>Ideal for:</strong> ${g.idealFor}</div>
   ` : '';
 
-  // Image
   const imgHTML = g.imageUrl
     ? `<img class="card-img" src="${g.imageUrl}" alt="${g.name}"
          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">`
     : '';
 
   return `
-  <div class="card ${allOOS?'oos':''}" id="${cardId}" style="animation-delay:${gi*0.04}s">
+  <div class="card ${allOOS?'oos':''}" id="${cardId}" style="animation-delay:${gi*0.04}s" data-variants='${JSON.stringify(g.variants)}'>
     <div class="card-img-wrap">
       ${imgHTML}
       <div class="card-img-placeholder" ${g.imageUrl?'style="display:none"':''}">🐟</div>
@@ -1071,9 +1117,15 @@ function cardHTML(g, gi) {
 
     <div class="card-body">
       <div class="card-name">${g.name}</div>
-      <div class="card-variant-label">${g.variant}</div>
 
-      <!-- Dynamic specs — updates with variant selection -->
+      <!-- Size variant buttons (Large / Medium etc) -->
+      ${g.variants.length > 1 ? `
+        <div class="size-variant-section" id="${cardId}_svbtns">
+          ${sizeVarButtons}
+        </div>
+      ` : `<div class="card-variant-label">${g.variants[0]?.variant || ''}</div>`}
+
+      <!-- Dynamic specs -->
       <div class="specs" id="${cardId}_specs">
         ${specsHTML(firstW)}
       </div>
@@ -1118,9 +1170,9 @@ function cardHTML(g, gi) {
 
 function specsHTML(w) {
   const parts = [];
-  if (w.pieces)  parts.push(`<span class="spec-item"><span class="spec-label">Pieces / Slices:</span><span class="spec-val">${w.pieces}</span></span>`);
   if (w.gross)   parts.push(`<span class="spec-item"><span class="spec-label">Gross:</span><span class="spec-val">${w.gross}</span></span>`);
   if (w.net)     parts.push(`<span class="spec-item"><span class="spec-label">Net:</span><span class="spec-val">${w.net}</span></span>`);
+  if (w.pieces)  parts.push(`<span class="spec-item"><span class="spec-label">Pieces / Slices:</span><span class="spec-val">${w.pieces}</span></span>`);
   if (w.serves)  parts.push(`<span class="spec-item"><span class="spec-label">Serves:</span><span class="spec-val">${w.serves}</span></span>`);
   if (w.cutSize) parts.push(`<span class="spec-item"><span class="spec-label">Cut:</span><span class="spec-val">${w.cutSize}</span></span>`);
   return parts.join('');
@@ -1173,8 +1225,6 @@ function selectVariant(cardId, wi) {
 }
 
 function getGroupByCardId(cardId) {
-  const idx = parseInt(cardId.replace('card_',''));
-  // Find in current rendered groups
   const cat = document.getElementById('catalog');
   const cards = cat.querySelectorAll('.card');
   let gi = 0;
@@ -1182,18 +1232,68 @@ function getGroupByCardId(cardId) {
     if (c.id === cardId) break;
     gi++;
   }
-  // Walk rendered groups
   let list = getFilteredGroups();
   return list[gi] || null;
 }
 
+// Track selected size variant per card
+const selSizeVariant = {};
+
+function selectSizeVariant(cardId, vi) {
+  const g = getGroupByCardId(cardId);
+  if (!g) return;
+  const v = g.variants[vi];
+  if (!v) return;
+
+  selSizeVariant[cardId] = vi;
+  selVariant[cardId] = 0; // reset weight selection
+
+  // Update group's active weights
+  g.weights = v.weights;
+  g.variant = v.variant;
+
+  // Update size variant button highlight
+  const svbtns = document.querySelectorAll(`#${cardId}_svbtns .size-var-btn`);
+  svbtns.forEach((b, i) => b.classList.toggle('sel', i === vi));
+
+  // Rebuild weight buttons
+  const vbtnsEl = document.getElementById(cardId + '_vbtns');
+  if (vbtnsEl) {
+    vbtnsEl.innerHTML = v.weights.map((w, wi) => `
+      <button
+        class="var-btn ${wi===0?'sel':''} ${!w.inStock?'oos-v':''}"
+        onclick="selectVariant('${cardId}',${wi})"
+        ${!w.inStock?'title="Out of Stock"':''}
+      >${w.sizeVariant || 'Standard'}</button>
+    `).join('');
+  }
+
+  // Update specs, price, stock tag with first weight of new variant
+  const firstW = v.weights[0];
+  document.getElementById(cardId + '_specs').innerHTML = specsHTML(firstW);
+  updatePrice(cardId);
+
+  const tag = document.getElementById(cardId + '_stag');
+  if (tag) {
+    tag.className = 'stock-tag ' + (firstW.inStock ? 'in' : 'out');
+    tag.textContent = firstW.inStock ? '✓ In Stock' : '📋 Pre-Book';
+  }
+
+  const btn = document.getElementById(cardId + '_addbtn');
+  if (btn) {
+    btn.disabled = false;
+    if (!firstW.inStock) { btn.textContent = '📋 Pre-Book'; btn.classList.add('prebook-btn'); }
+    else { btn.textContent = 'Add'; btn.classList.remove('prebook-btn'); }
+  }
+}
+
 function getFilteredGroups() {
   let list = groups;
-  if (activeFilter === 'in')  list = list.filter(g => g.weights.some(w => w.inStock));
-  if (activeFilter === 'out') list = list.filter(g => g.weights.every(w => !w.inStock));
+  if (activeFilter === 'in')  list = list.filter(g => g.variants.some(v => v.weights.some(w => w.inStock)));
+  if (activeFilter === 'out') list = list.filter(g => g.variants.every(v => v.weights.every(w => !w.inStock)));
   if (searchQ) list = list.filter(g =>
     g.name.toLowerCase().includes(searchQ) ||
-    g.variant.toLowerCase().includes(searchQ) ||
+    g.variants.some(v => v.variant.toLowerCase().includes(searchQ)) ||
     g.category.toLowerCase().includes(searchQ)
   );
   return list;

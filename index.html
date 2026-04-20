@@ -345,7 +345,7 @@ header {
 
 .var-btn:hover { background: var(--glass-hover); color: var(--text); border-color: var(--teal); }
 .var-btn.sel   { background: var(--teal); border-color: var(--teal); color: #0a1628; }
-.var-btn.oos-v { opacity:0.4; cursor:not-allowed; }
+.var-btn.oos-v { opacity:1; cursor:pointer; }
 
 .var-btn small { display: block; font-size: 11.5px; font-weight: 600; opacity: 1; }
 
@@ -1520,9 +1520,8 @@ function cardHTML(g, gi) {
   // Weight buttons for first slice variant
   const weightButtons = firstSV.weights.map((w, wi) => `
     <button
-      class="var-btn ${wi===0?'sel':''} ${!w.inStock?'oos-v':''}"
+      class="var-btn ${wi===0?'sel':''}"
       onclick="selectWeight('${cardId}',${wi})"
-      ${!w.inStock?'title="Out of Stock"':''}
     >
       ${w.sizeVariant || 'Standard'}
     </button>
@@ -1667,9 +1666,8 @@ function selectSliceVariant(cardId, svi) {
     if (sv.weights.length > 1) {
       vbtnsEl.style.display = '';
       vbtnsEl.innerHTML = sv.weights.map((ww, wi) => `
-        <button class="var-btn ${wi===0?'sel':''} ${!ww.inStock?'oos-v':''}"
-          onclick="selectWeight('${cardId}',${wi})"
-          ${!ww.inStock?'title="Out of Stock"':''}>
+        <button class="var-btn ${wi===0?'sel':''}"
+          onclick="selectWeight('${cardId}',${wi})">
           ${ww.sizeVariant || 'Standard'}
         </button>
       `).join('');
@@ -2197,7 +2195,7 @@ function toggleSearch() {
 /* ── CONFIG: Replace with your own image URL ──
    MEENA_IMAGE_URL: Set to a direct image link (PNG/WebP, ideally transparent BG)
    Leave as '' to use the default SVG mermaid character.                         */
-const MEENA_IMAGE_URL = 'https://drive.google.com/thumbnail?id=1h_iSJMXQCt9skBACJukAmd50JfpcgUgX&sz=w800'; // ← PASTE YOUR IMAGE URL HERE
+const MEENA_IMAGE_URL = ''; // ← PASTE YOUR IMAGE URL HERE
 
 const FISH_LIST = [
   'Seer (Vanjaram)','Baracuda (Seela)','Mackerel (Kanangathai)','Pink Perch (Sankara)',

@@ -747,8 +747,8 @@ header {
 .slice-var-btn:hover { background: var(--glass-hover); color: var(--text); }
 .slice-var-btn.sel   { background: rgba(45,212,176,0.18); border-color: var(--teal); color: var(--teal); }
 
-/* ── Meena Rani AI Overlay ── */
-#meena-overlay {
+/* ── Nira AI Overlay ── */
+#nira-overlay {
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -757,16 +757,16 @@ header {
   transition: opacity 0.4s ease;
 }
 
-#meena-overlay.open {
+#nira-overlay.open {
   display: flex;
   flex-direction: column;
 }
 
-#meena-overlay.visible {
+#nira-overlay.visible {
   opacity: 1;
 }
 
-.meena-bg {
+.nira-bg {
   position: absolute;
   inset: 0;
   background: linear-gradient(180deg,
@@ -781,7 +781,7 @@ header {
 }
 
 /* Animated ocean rays */
-.meena-bg::before {
+.nira-bg::before {
   content: '';
   position: absolute;
   inset: 0;
@@ -798,7 +798,7 @@ header {
 }
 
 /* Bubble particles */
-.meena-bubbles {
+.nira-bubbles {
   position: absolute;
   inset: 0;
   pointer-events: none;
@@ -818,7 +818,7 @@ header {
 }
 
 /* Caustics light patterns */
-.meena-bg::after {
+.nira-bg::after {
   content: '';
   position: absolute;
   width: 200%; height: 200%;
@@ -835,7 +835,7 @@ header {
   100% { transform: rotate(3deg) scale(1.1); }
 }
 
-.meena-close {
+.nira-close {
   position: absolute;
   top: 16px; right: 16px;
   z-index: 10;
@@ -851,10 +851,10 @@ header {
   backdrop-filter: blur(10px);
 }
 
-.meena-close:hover { background: rgba(255,255,255,0.2); color: #fff; }
+.nira-close:hover { background: rgba(255,255,255,0.2); color: #fff; }
 
 /* Mermaid container */
-.meena-mermaid-wrap {
+.nira-mermaid-wrap {
   position: absolute;
   bottom: 42%;
   left: 50%;
@@ -866,12 +866,12 @@ header {
   pointer-events: none;
 }
 
-.meena-mermaid-wrap.risen {
+.nira-mermaid-wrap.risen {
   transform: translateX(-50%) translateY(0px);
   opacity: 1;
 }
 
-.meena-mermaid-svg {
+.nira-mermaid-svg {
   width: 200px;
   filter: drop-shadow(0 0 20px rgba(45,212,176,0.6)) drop-shadow(0 0 40px rgba(45,212,176,0.3));
   animation: floatMermaid 4s ease-in-out infinite;
@@ -883,7 +883,7 @@ header {
 }
 
 /* Glow ring under mermaid */
-.meena-glow-ring {
+.nira-glow-ring {
   position: absolute;
   bottom: -20px;
   left: 50%;
@@ -900,7 +900,7 @@ header {
 }
 
 /* Chat interface */
-.meena-chat-wrap {
+.nira-chat-wrap {
   position: absolute;
   inset: 0;
   display: flex;
@@ -911,16 +911,16 @@ header {
   transition: opacity 0.5s ease 0.3s;
 }
 
-.meena-chat-wrap.visible { opacity: 1; pointer-events: auto; }
+.nira-chat-wrap.visible { opacity: 1; pointer-events: auto; }
 
-.meena-chat-header {
+.nira-chat-header {
   padding: 16px 20px 12px;
   padding-top: max(16px, env(safe-area-inset-top));
   text-align: center;
   flex-shrink: 0;
 }
 
-.meena-name-badge {
+.nira-name-badge {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -935,14 +935,14 @@ header {
   backdrop-filter: blur(12px);
 }
 
-.meena-avatar-dot {
+.nira-avatar-dot {
   width: 8px; height: 8px;
   border-radius: 50%;
   background: var(--teal);
   animation: pulse 2s ease-in-out infinite;
 }
 
-.meena-messages {
+.nira-messages {
   flex: 1;
   overflow-y: auto;
   padding: 12px 16px;
@@ -953,10 +953,10 @@ header {
   scrollbar-color: rgba(45,212,176,0.3) transparent;
 }
 
-.meena-messages::-webkit-scrollbar { width: 4px; }
-.meena-messages::-webkit-scrollbar-thumb { background: rgba(45,212,176,0.3); border-radius: 2px; }
+.nira-messages::-webkit-scrollbar { width: 4px; }
+.nira-messages::-webkit-scrollbar-thumb { background: rgba(45,212,176,0.3); border-radius: 2px; }
 
-.meena-msg {
+.nira-msg {
   max-width: 82%;
   border-radius: 16px;
   padding: 10px 14px;
@@ -970,7 +970,7 @@ header {
   to   { opacity:1; transform: scale(1) translateY(0); }
 }
 
-.meena-msg.agent {
+.nira-msg.agent {
   align-self: flex-start;
   background: rgba(45,212,176,0.12);
   border: 0.5px solid rgba(45,212,176,0.25);
@@ -978,7 +978,7 @@ header {
   border-bottom-left-radius: 4px;
 }
 
-.meena-msg.user {
+.nira-msg.user {
   align-self: flex-end;
   background: rgba(255,255,255,0.1);
   border: 0.5px solid rgba(255,255,255,0.15);
@@ -986,7 +986,7 @@ header {
   border-bottom-right-radius: 4px;
 }
 
-.meena-typing {
+.nira-typing {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -999,7 +999,7 @@ header {
   width: fit-content;
 }
 
-.meena-typing span {
+.nira-typing span {
   width: 7px; height: 7px;
   border-radius: 50%;
   background: var(--teal);
@@ -1007,8 +1007,8 @@ header {
   animation: typingDot 1.2s ease-in-out infinite;
 }
 
-.meena-typing span:nth-child(2) { animation-delay: 0.2s; }
-.meena-typing span:nth-child(3) { animation-delay: 0.4s; }
+.nira-typing span:nth-child(2) { animation-delay: 0.2s; }
+.nira-typing span:nth-child(3) { animation-delay: 0.4s; }
 
 @keyframes typingDot {
   0%,80%,100% { opacity:0.3; transform:scale(0.8); }
@@ -1018,7 +1018,7 @@ header {
 /* Typewriter effect */
 .typewriter { overflow: hidden; white-space: pre-wrap; }
 
-.meena-options-row {
+.nira-options-row {
   padding: 10px 16px;
   padding-bottom: max(12px, env(safe-area-inset-bottom));
   display: flex;
@@ -1033,7 +1033,7 @@ header {
   align-items: center;
 }
 
-.meena-opt-btn {
+.nira-opt-btn {
   background: rgba(45,212,176,0.12);
   border: 0.5px solid rgba(45,212,176,0.35);
   border-radius: 100px;
@@ -1047,7 +1047,7 @@ header {
   animation: optPop 0.28s cubic-bezier(0.34,1.56,0.64,1) both;
 }
 
-.meena-opt-btn:hover {
+.nira-opt-btn:hover {
   background: var(--teal);
   color: #0a1628;
   transform: scale(1.06);
@@ -1092,21 +1092,21 @@ header {
 }
 
 @media (max-width: 520px) {
-  .meena-mermaid-wrap { width: 160px; bottom: 43%; }
-  .meena-mermaid-svg  { width: 160px; }
+  .nira-mermaid-wrap { width: 160px; bottom: 43%; }
+  .nira-mermaid-svg  { width: 160px; }
   .catalog { grid-template-columns: 1fr; gap: 12px; padding: 10px 12px 150px; }
   .controls { padding: 14px 12px 4px; }
   .input-row { flex-direction: column; }
   .header-inner { padding: 0 14px; }
 }
 
-.pill.meena-pill {
+.pill.nira-pill {
   background: rgba(45,212,176,0.1);
   border-color: rgba(45,212,176,0.35);
   color: var(--teal);
   font-weight: 700;
 }
-.pill.meena-pill:hover { background: rgba(45,212,176,0.2); }
+.pill.nira-pill:hover { background: rgba(45,212,176,0.2); }
 </style>
 </head>
 <body>
@@ -1151,7 +1151,7 @@ header {
   <button class="pill on" onclick="setFilter('all',this)">All</button>
   <button class="pill" onclick="setFilter('in',this)">✓ In Stock</button>
   <button class="pill" onclick="setFilter('out',this)">📋 Pre-Book</button>
-  <button class="pill meena-pill" onclick="openMeena()">🧜‍♀️ Need help choosing fish?</button>
+  <button class="pill nira-pill" onclick="opennira()">🧜‍♀️ Need help choosing fish?</button>
   <div class="search-wrap">
     <input class="search" id="search-input" type="text" 
       placeholder="Search fish…" oninput="doSearch(this.value)">
@@ -1209,18 +1209,18 @@ header {
   </div>
 </div>
 
-<!-- ════════════ MEENA RANI AI OVERLAY ════════════ -->
-<div id="meena-overlay">
-  <div class="meena-bg">
-    <div class="meena-bubbles" id="meena-bubbles"></div>
+<!-- ════════════ Nira AI OVERLAY ════════════ -->
+<div id="nira-overlay">
+  <div class="nira-bg">
+    <div class="nira-bubbles" id="nira-bubbles"></div>
   </div>
 
-  <button class="meena-close" onclick="closeMeena()">✕</button>
+  <button class="nira-close" onclick="closenira()">✕</button>
 
   <!-- Rising mermaid -->
-  <div class="meena-mermaid-wrap" id="meena-mermaid">
-    <div class="meena-glow-ring"></div>
-    <svg class="meena-mermaid-svg" viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg">
+  <div class="nira-mermaid-wrap" id="nira-mermaid">
+    <div class="nira-glow-ring"></div>
+    <svg class="nira-mermaid-svg" viewBox="0 0 200 320" xmlns="http://www.w3.org/2000/svg">
       <!-- Tail -->
       <ellipse cx="100" cy="290" rx="50" ry="18" fill="#0d4a3a" opacity="0.6"/>
       <!-- Tail fin left -->
@@ -1303,15 +1303,15 @@ header {
   </div>
 
   <!-- Chat UI -->
-  <div class="meena-chat-wrap" id="meena-chat">
-    <div class="meena-chat-header">
-      <div class="meena-name-badge">
-        <div class="meena-avatar-dot"></div>
-        Meena Rani · Your Fish Guide
+  <div class="nira-chat-wrap" id="nira-chat">
+    <div class="nira-chat-header">
+      <div class="nira-name-badge">
+        <div class="nira-avatar-dot"></div>
+        Nira · Your Fish Guide
       </div>
     </div>
-    <div class="meena-messages" id="meena-messages"></div>
-    <div class="meena-options-row" id="meena-options"></div>
+    <div class="nira-messages" id="nira-messages"></div>
+    <div class="nira-options-row" id="nira-options"></div>
   </div>
 </div>
 
@@ -2190,12 +2190,12 @@ function toggleSearch() {
   else { inp.value = ''; doSearch(''); }
 }
 
-/* ══ MEENA RANI AI FISH ADVISOR ══════════════ */
+/* ══ Nira AI FISH ADVISOR ══════════════ */
 
 /* ── CONFIG: Replace with your own image URL ──
-   MEENA_IMAGE_URL: Set to a direct image link (PNG/WebP, ideally transparent BG)
+   nira_IMAGE_URL: Set to a direct image link (PNG/WebP, ideally transparent BG)
    Leave as '' to use the default SVG mermaid character.                         */
-const MEENA_IMAGE_URL = 'https://drive.google.com/thumbnail?id=1h_iSJMXQCt9skBACJukAmd50JfpcgUgX&sz=w800'; // ← PASTE YOUR IMAGE URL HERE
+const nira_IMAGE_URL = 'https://drive.google.com/thumbnail?id=1h_iSJMXQCt9skBACJukAmd50JfpcgUgX&sz=w800'; // ← PASTE YOUR IMAGE URL HERE
 
 const FISH_LIST = [
   'Seer (Vanjaram)','Baracuda (Seela)','Mackerel (Kanangathai)','Pink Perch (Sankara)',
@@ -2212,7 +2212,7 @@ const FISH_LIST = [
 ];
 
 /* Conversation flow — fully button driven, no typing */
-const MEENA_FLOW = [
+const nira_FLOW = [
   {
     key: 'purpose',
     question: 'What is this meal for? 🌊',
@@ -2276,12 +2276,12 @@ const COOKING_RECO = {
   'Steam':      ['Baramudi (Koduva)','White Pomfret (Vella Vavval)','Cod (Kalavan)','Pink Perch (Sankara)'],
 };
 
-let meenaStep     = 0;
-let meenaAnswers  = {};
-let meenaTyping   = false;
+let niraStep     = 0;
+let niraAnswers  = {};
+let niraTyping   = false;
 
-function openMeena() {
-  const overlay = document.getElementById('meena-overlay');
+function opennira() {
+  const overlay = document.getElementById('nira-overlay');
   overlay.style.display = 'flex';
   requestAnimationFrame(() => {
     overlay.classList.add('open');
@@ -2289,18 +2289,18 @@ function openMeena() {
   });
 
   // Apply custom image if set
-  const mermaidWrap = document.getElementById('meena-mermaid');
-  if (MEENA_IMAGE_URL) {
+  const mermaidWrap = document.getElementById('nira-mermaid');
+  if (nira_IMAGE_URL) {
     mermaidWrap.innerHTML = `
-      <div class="meena-glow-ring"></div>
-      <img src="${MEENA_IMAGE_URL}" class="meena-mermaid-svg"
+      <div class="nira-glow-ring"></div>
+      <img src="${nira_IMAGE_URL}" class="nira-mermaid-svg"
            style="object-fit:contain;border-radius:12px;"
-           alt="Meena Rani">
+           alt="Nira">
     `;
   }
 
   // Generate bubbles
-  const bubbles = document.getElementById('meena-bubbles');
+  const bubbles = document.getElementById('nira-bubbles');
   bubbles.innerHTML = '';
   for (let i = 0; i < 20; i++) {
     const b = document.createElement('div');
@@ -2311,40 +2311,40 @@ function openMeena() {
   }
 
   // Reset state
-  meenaStep = 0;
-  meenaAnswers = {};
-  document.getElementById('meena-messages').innerHTML = '';
-  document.getElementById('meena-options').innerHTML = '';
+  niraStep = 0;
+  niraAnswers = {};
+  document.getElementById('nira-messages').innerHTML = '';
+  document.getElementById('nira-options').innerHTML = '';
 
   // Rise mermaid then start
   setTimeout(() => {
-    document.getElementById('meena-mermaid').classList.add('risen');
+    document.getElementById('nira-mermaid').classList.add('risen');
     setTimeout(() => {
-      document.getElementById('meena-chat').classList.add('visible');
-      const intro = `Hello dear, welcome to TruSea Fish! 🧜‍♀️ I'm Meena Rani, your personal fish guide. Let me help you choose the perfect catch!`;
-      addMeenaBotMsg(intro, () => askStep(0));
+      document.getElementById('nira-chat').classList.add('visible');
+      const intro = `Hello dear, welcome to TruSea Fish! 🧜‍♀️ I'm Nira, your personal fish guide. Let me help you choose the perfect catch!`;
+      addniraBotMsg(intro, () => askStep(0));
     }, 600);
   }, 400);
 
   document.body.style.overflow = 'hidden';
 }
 
-function closeMeena() {
-  const overlay = document.getElementById('meena-overlay');
+function closenira() {
+  const overlay = document.getElementById('nira-overlay');
   overlay.classList.remove('visible');
   setTimeout(() => {
     overlay.classList.remove('open');
     overlay.style.display = 'none';
-    document.getElementById('meena-mermaid').classList.remove('risen');
-    document.getElementById('meena-chat').classList.remove('visible');
+    document.getElementById('nira-mermaid').classList.remove('risen');
+    document.getElementById('nira-chat').classList.remove('visible');
   }, 400);
   document.body.style.overflow = '';
 }
 
-function addMeenaBotMsg(text, onDone) {
-  const msgs = document.getElementById('meena-messages');
+function addniraBotMsg(text, onDone) {
+  const msgs = document.getElementById('nira-messages');
   const div = document.createElement('div');
-  div.className = 'meena-msg agent';
+  div.className = 'nira-msg agent';
   div.textContent = '';
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
@@ -2362,42 +2362,42 @@ function addMeenaBotMsg(text, onDone) {
   type();
 }
 
-function addMeenaUserMsg(text) {
-  const msgs = document.getElementById('meena-messages');
+function addniraUserMsg(text) {
+  const msgs = document.getElementById('nira-messages');
   const div = document.createElement('div');
-  div.className = 'meena-msg user';
+  div.className = 'nira-msg user';
   div.textContent = text;
   msgs.appendChild(div);
   msgs.scrollTop = msgs.scrollHeight;
 }
 
 function askStep(stepIdx) {
-  if (stepIdx >= MEENA_FLOW.length) {
+  if (stepIdx >= nira_FLOW.length) {
     showRecommendations();
     return;
   }
-  const step = MEENA_FLOW[stepIdx];
-  addMeenaBotMsg(step.question, () => {
+  const step = nira_FLOW[stepIdx];
+  addniraBotMsg(step.question, () => {
     showOptions(step.options, (val, label) => {
-      addMeenaUserMsg(label);
-      meenaAnswers[step.key] = val;
-      document.getElementById('meena-options').innerHTML = '';
+      addniraUserMsg(label);
+      niraAnswers[step.key] = val;
+      document.getElementById('nira-options').innerHTML = '';
       askStep(stepIdx + 1);
     });
   });
 }
 
 function showOptions(options, onSelect) {
-  const row = document.getElementById('meena-options');
+  const row = document.getElementById('nira-options');
   row.innerHTML = '';
   options.forEach((opt, i) => {
     const btn = document.createElement('button');
-    btn.className = 'meena-opt-btn';
+    btn.className = 'nira-opt-btn';
     btn.textContent = opt.label;
     btn.style.animationDelay = (i * 0.06) + 's';
     btn.onclick = () => {
       // Disable all buttons immediately
-      row.querySelectorAll('.meena-opt-btn').forEach(b => b.disabled = true);
+      row.querySelectorAll('.nira-opt-btn').forEach(b => b.disabled = true);
       onSelect(opt.value, opt.label);
     };
     row.appendChild(btn);
@@ -2405,7 +2405,7 @@ function showOptions(options, onSelect) {
 }
 
 function showRecommendations() {
-  const { purpose, cooking, taste } = meenaAnswers;
+  const { purpose, cooking, taste } = niraAnswers;
 
   // Intersect purpose + cooking recommendations
   const byPurpose  = RECO[purpose]  || [];
@@ -2421,13 +2421,13 @@ function showRecommendations() {
   const pickLines = picks.map((f,i) => medals[i] + ' ' + f).join('\n');
   const msg = 'Based on your choices, here are the best fish for you:\n\n' + pickLines + '\n\nBest for ' + cookingLabel + '. Tap a fish to see it! 👇';
 
-  addMeenaBotMsg(msg, () => {
+  addniraBotMsg(msg, () => {
     addFishChips(picks);
   });
 }
 
 function addFishChips(chips) {
-  const msgs = document.getElementById('meena-messages');
+  const msgs = document.getElementById('nira-messages');
   const row = document.createElement('div');
   row.className = 'fish-chips';
   chips.forEach((fish, i) => {
@@ -2442,25 +2442,25 @@ function addFishChips(chips) {
   msgs.scrollTop = msgs.scrollHeight;
 
   // Show restart option
-  const optRow = document.getElementById('meena-options');
+  const optRow = document.getElementById('nira-options');
   optRow.innerHTML = '';
   const restartBtn = document.createElement('button');
-  restartBtn.className = 'meena-opt-btn';
+  restartBtn.className = 'nira-opt-btn';
   restartBtn.textContent = '🔄 Start Over';
   restartBtn.style.animationDelay = '0.3s';
   restartBtn.onclick = () => {
-    meenaStep = 0;
-    meenaAnswers = {};
-    document.getElementById('meena-messages').innerHTML = '';
+    niraStep = 0;
+    niraAnswers = {};
+    document.getElementById('nira-messages').innerHTML = '';
     optRow.innerHTML = '';
     const intro = "Let's find you another perfect catch! 🌊";
-    addMeenaBotMsg(intro, () => askStep(0));
+    addniraBotMsg(intro, () => askStep(0));
   };
   optRow.appendChild(restartBtn);
 }
 
 function onFishChipClick(fishName) {
-  closeMeena();
+  closenira();
   setTimeout(() => {
     searchQ = '';
     activeFilter = 'all';

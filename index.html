@@ -1823,7 +1823,9 @@ function addToCart(cardId) {
     + (extraOn ? extraQty * g.extraPPP : 0);
 
   const key = cardId + '_' + svi + '_' + wi;
-  const label = `${g.name} – ${sv.variant} (${w.gross} / Net ${w.net})`;
+  // sizeVariant = "500g" or "1kg" from Sheet1 Col P — used for MIS product report
+  const sizeTag = w.sizeVariant ? ` - ${w.sizeVariant}` : '';
+  const label = `${g.name} – ${sv.variant}${sizeTag}`;
   const details = [];
   if (addonOn) details.push(`Head & Tail +₹${g.addonPrice}`);
   if (extraOn) details.push(`${extraQty} extra piece(s) +₹${extraQty * g.extraPPP}`);
@@ -2127,7 +2129,11 @@ async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems,
   const timestamp = new Date().toLocaleString('en-IN');
 
   // Build single row per order
-  const inStockNames = inStockItems.map(([, i]) => i.label).join(' | ');
+  // Embed qty in product label: "Seer - Vanjaram – Small Slices - 1kg ×2"
+  // Apps Script + MIS dashboard use this to extract fish name, size, qty
+  const inStockNames = inStockItems.map(([, i]) =>
+    i.qty > 1 ? `${i.label} ×${i.qty}` : i.label
+  ).join(' | ');
   // ⚠️ Keep empty strings — index must match product index
   // Seer(no addon)="" | Baracuda(addon)="Head & Tail +₹199"
   const addonsAll    = inStockItems.map(([, i]) => i.details || '').join(' | ');

@@ -1427,9 +1427,11 @@ function groupProducts(rows) {
     // find or create sliceVariant group
     let sv = card.sliceVariants.find(s => s.variant === r.variant);
     if (!sv) {
-      sv = { variant: r.variant, weights: [] };
+      sv = { variant: r.variant, weights: [], imageUrl: '' };
       card.sliceVariants.push(sv);
     }
+    // Store imageUrl per sliceVariant — each variant can have its own image
+    if (r.imageUrl) sv.imageUrl = r.imageUrl;
     sv.weights.push({
       gross:   r.gross,
       net:     r.net,
@@ -1440,7 +1442,7 @@ function groupProducts(rows) {
       inStock: r.inStock,
       sizeVariant: r.sizeVariant,
     });
-    // update imageUrl if this row has one and card doesn't yet
+    // Fallback: card-level imageUrl (first available)
     if (!card.imageUrl && r.imageUrl) card.imageUrl = r.imageUrl;
   });
   return Array.from(nameMap.values());
@@ -1660,6 +1662,18 @@ function selectSliceVariant(cardId, svi) {
   document.querySelectorAll(`#${cardId}_svbtns .slice-var-btn`).forEach((b, i) =>
     b.classList.toggle('sel', i === svi));
 
+  // Update card image — each sliceVariant has its own image from Sheet1 Col L
+  const imgEl  = document.querySelector('#' + cardId + ' .card-img');
+  const phEl   = document.querySelector('#' + cardId + ' .card-img-placeholder');
+  const newImg = sv.imageUrl || g.imageUrl;
+  if (imgEl && newImg) {
+    imgEl.src = newImg;
+    imgEl.style.display = '';
+    if (phEl) phEl.style.display = 'none';
+  } else if (!newImg) {
+    if (imgEl) imgEl.style.display = 'none';
+    if (phEl) phEl.style.display = '';
+  }
   // Rebuild weight buttons
   const vbtnsEl = document.getElementById(cardId + '_vbtns');
   if (vbtnsEl) {

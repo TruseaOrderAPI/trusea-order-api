@@ -2301,7 +2301,6 @@ _Sent via TruSea Fresh · ${orderId}_`;
   logToSheet({
     orderId, name, phone, address, mapLoc,
     inStockItems, preBookItems, grandTotal,
-    paymentMode: 'COD',
   });
 
   // Clear cart after short delay
@@ -2670,7 +2669,7 @@ async function sendWA() {
   logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal });
 }
 
-async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal, paymentMode }) {
+async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal }) {
   if (CONFIG.APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
 
   const status = document.getElementById('submit-status');
@@ -2711,7 +2710,6 @@ async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems,
     preBook:     preBookNames || '',
     price:       priceBreakdown,
     orderTotal:  grandTotal,
-    paymentMode: paymentMode || 'Online', // 'Online' or 'COD'
   };
 
   try {

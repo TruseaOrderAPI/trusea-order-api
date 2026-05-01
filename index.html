@@ -2390,9 +2390,13 @@ async function submitPayUForm() {
     // Email fallback (PayU requires email)
     const email = 'customer@trusea.in';
 
+    // Unique txnid every attempt — PayU rejects reused txnids
+    // orderId (TSF-0068) = display; txnid (TSF-0068-timestamp) = PayU unique key
+    const txnid = d.orderId + '-' + Date.now();
+
     // Get hash from Apps Script (Salt stays secure on server)
     const hashRes = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=payuHash&key=' + CONFIG.PAYU_KEY +
-      '&txnid=' + d.orderId +
+      '&txnid=' + txnid +
       '&amount=' + d.grandTotal +
       '&productinfo=' + encodeURIComponent('TruSea Fish Order') +
       '&firstname=' + encodeURIComponent(d.name) +
@@ -2411,7 +2415,7 @@ async function submitPayUForm() {
     form.action = payuUrl;
 
     document.getElementById('pf-key').value         = CONFIG.PAYU_KEY;
-    document.getElementById('pf-txnid').value       = d.orderId;
+    document.getElementById('pf-txnid').value       = txnid;
     document.getElementById('pf-amount').value      = d.grandTotal;
     document.getElementById('pf-productinfo').value = 'TruSea Fish Order';
     document.getElementById('pf-firstname').value   = d.name;

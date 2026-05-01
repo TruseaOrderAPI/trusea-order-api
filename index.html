@@ -654,36 +654,6 @@ header {
   transition: all 0.18s;
 }
 .wa-btn:hover { background: #1db954; }
-
-/* Payment buttons row */
-.pay-btn-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 0;
-}
-.pay-btn-row .wa-btn { margin: 0; box-shadow: none; }
-.cod-btn {
-  width: 100%;
-  background: rgba(255,255,255,0.06);
-  border: 1.5px solid rgba(255,255,255,0.15);
-  color: var(--text);
-  padding: 14px;
-  border-radius: 13px;
-  font-family: inherit;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  transition: all 0.18s;
-}
-.cod-btn:hover {
-  background: rgba(255,255,255,0.12);
-  border-color: rgba(255,255,255,0.3);
-}
 .wa-icon { width: 20px; height: 20px; fill: #fff; flex-shrink: 0; }
 
 .addr-field {
@@ -1137,66 +1107,6 @@ header {
   font-weight: 700;
 }
 .pill.nira-pill:hover { background: rgba(45,212,176,0.2); }
-
-/* ── PayU Payment Overlay ── */
-#payu-overlay {
-  position: fixed; inset: 0; z-index: 9999;
-  background: rgba(10,22,40,0.97);
-  display: none; flex-direction: column;
-  align-items: center; justify-content: center;
-  padding: 24px;
-}
-#payu-overlay.open { display: flex; }
-.payu-box {
-  background: linear-gradient(160deg,#0d2137,#0a1628);
-  border: 1px solid rgba(45,212,176,0.25);
-  border-radius: 24px;
-  padding: 28px 24px 24px;
-  width: 100%; max-width: 400px;
-  text-align: center;
-  box-shadow: 0 8px 40px rgba(0,0,0,0.5);
-}
-.payu-logo  { font-size: 28px; margin-bottom: 6px; }
-.payu-title { font-size: 18px; font-weight: 700; color: var(--teal); margin-bottom: 4px; }
-.payu-sub   { font-size: 12px; color: var(--text3); margin-bottom: 20px; }
-.payu-amount {
-  font-size: 38px; font-weight: 800; color: #fff;
-  letter-spacing: -1px; margin-bottom: 6px;
-}
-.payu-order-id { font-size: 11px; color: var(--text3); margin-bottom: 20px; }
-.payu-divider  { height: 1px; background: rgba(255,255,255,0.08); margin: 16px 0; }
-.payu-methods  { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-.payu-method-pill {
-  background: rgba(255,255,255,0.06);
-  border: 1px solid rgba(255,255,255,0.12);
-  border-radius: 20px; padding: 5px 12px;
-  font-size: 11px; color: var(--text2); font-weight: 600;
-}
-.payu-pay-btn {
-  width: 100%; padding: 16px;
-  background: linear-gradient(135deg, #2dd4b0, #1aa38d);
-  border: none; border-radius: 14px;
-  font-size: 16px; font-weight: 800; color: #0a1628;
-  cursor: pointer; letter-spacing: 0.3px;
-  transition: opacity 0.2s; margin-bottom: 12px;
-}
-.payu-pay-btn:active { opacity: 0.85; }
-.payu-cancel-btn {
-  background: none; border: none;
-  font-size: 13px; color: var(--text3);
-  cursor: pointer; padding: 8px; text-decoration: underline;
-}
-.payu-secure {
-  font-size: 10px; color: var(--text3); margin-top: 10px;
-  display: flex; align-items: center; justify-content: center; gap: 4px;
-}
-.payu-test-banner {
-  background: rgba(251,146,60,0.15);
-  border: 1px solid rgba(251,146,60,0.3);
-  border-radius: 8px; padding: 6px 12px;
-  font-size: 11px; color: #fb923c;
-  margin-bottom: 16px; font-weight: 600;
-}
 </style>
 </head>
 <body>
@@ -1292,55 +1202,14 @@ header {
       <span class="total-label">Estimated Total</span>
       <span class="total-val" id="total-val">₹0</span>
     </div>
-    <div class="pay-btn-row">
-      <button class="wa-btn" onclick="initiatePayU()" style="background:linear-gradient(135deg,#2dd4b0,#1aa38d);color:#0a1628;font-size:13px;">
-        🔒 Pay Now
-      </button>
-      <button class="cod-btn" onclick="placeCOD()">
-        📦 Pay on Delivery
-      </button>
-    </div>
+    <button class="wa-btn" onclick="sendWA()">
+      <svg class="wa-icon" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Send Order via WhatsApp
+    </button>
   </div>
 </div>
 
 <!-- ════════════ Nira AI OVERLAY ════════════ -->
-<!-- ════════════ PayU Payment Overlay ════════════ -->
-<div id="payu-overlay">
-  <div class="payu-box">
-    <div class="payu-logo">🔒</div>
-    <div class="payu-title">Secure Payment</div>
-    <div class="payu-sub">Powered by PayU</div>
-    <div class="payu-test-banner" id="payu-test-banner">⚠️ TEST MODE — No real money charged</div>
-    <div class="payu-amount" id="payu-amount-display">₹0</div>
-    <div class="payu-order-id" id="payu-order-display">Order ID: —</div>
-    <div class="payu-methods">
-      <span class="payu-method-pill">💳 Cards</span>
-      <span class="payu-method-pill">📱 UPI</span>
-      <span class="payu-method-pill">🏦 NetBanking</span>
-      <span class="payu-method-pill">👛 Wallets</span>
-    </div>
-    <button class="payu-pay-btn" id="payu-pay-btn" onclick="submitPayUForm()">
-      🔒 Pay Securely
-    </button>
-    <button class="payu-cancel-btn" onclick="closePayUOverlay()">Cancel & go back</button>
-    <div class="payu-secure">🔐 256-bit SSL encrypted · Your data is safe</div>
-  </div>
-</div>
-
-<!-- Hidden PayU POST form — submitted programmatically -->
-<form id="payu-form" method="POST" style="display:none">
-  <input type="hidden" name="key"         id="pf-key">
-  <input type="hidden" name="txnid"       id="pf-txnid">
-  <input type="hidden" name="amount"      id="pf-amount">
-  <input type="hidden" name="productinfo" id="pf-productinfo">
-  <input type="hidden" name="firstname"   id="pf-firstname">
-  <input type="hidden" name="email"       id="pf-email">
-  <input type="hidden" name="phone"       id="pf-phone">
-  <input type="hidden" name="surl"        id="pf-surl">
-  <input type="hidden" name="furl"        id="pf-furl">
-  <input type="hidden" name="hash"        id="pf-hash">
-</form>
-
 <div id="nira-overlay">
   <div class="nira-bg">
     <div class="nira-bubbles" id="nira-bubbles"></div>
@@ -1470,9 +1339,7 @@ const CONFIG = {
   SHEET_ID:         '1LdJAHcoYX8ruxVEKG5j-X1KyaZohOLfhyYaUBmsVoyI',
   WA_NUMBER:        '919003346276',
   SHEET_TAB:        'Sheet1',
-  APPS_SCRIPT_URL:  'https://script.google.com/macros/s/AKfycbzIJUz0PY02TTXeVYehfmiFMMiXH7iyThkzjpXDA5VBEnkNIiL9FgajY90oLOhX_wtO/exec',
-  PAYU_KEY:         'sFBnVB',   // PayU Merchant Key
-  PAYU_MODE:        'live',     // 'test' → 'live' after Sir returns & salt regenerated
+  APPS_SCRIPT_URL:  'https://script.google.com/macros/s/AKfycbzZbeMZQw16QzZBLgLFGsyFuPj_KNS3yKHn1-SErbfTiLmfQHaqlOrwKCTcoX6bUm7A/exec',  // ← paste after deploy
 };
 
 /* ══ STATE ══════════════════════════ */
@@ -2205,410 +2072,6 @@ function loadProfile() {
   } catch(e) {}
 }
 
-/* ══ COD — Pay on Delivery ══════════ */
-async function placeCOD() {
-  const items = Object.entries(cart);
-  if (!items.length) { alert('Please add items to your order first!'); return; }
-
-  const name    = document.getElementById('cust-name').value.trim();
-  const phone   = document.getElementById('cust-phone').value.trim();
-  const address = document.getElementById('cust-address').value.trim();
-  const mapLoc  = document.getElementById('cust-maploc').value.trim();
-
-  if (!name)    { document.getElementById('cust-name').focus();    alert('Please enter your name'); return; }
-  if (!phone)   { document.getElementById('cust-phone').focus();   alert('Please enter your phone number'); return; }
-  if (!address) { document.getElementById('cust-address').focus(); alert('Please enter your delivery address'); return; }
-
-  saveProfile();
-
-  const orderId       = await genOrderId();
-  const date          = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
-  const inStockItems  = items.filter(([, i]) => !i.preBook);
-  const preBookItems  = items.filter(([, i]) =>  i.preBook);
-
-  let grandTotal = 0;
-  let waLines    = '';
-
-  inStockItems.forEach(([, item]) => {
-    const baseP  = item.basePrice || item.unitPrice;
-    const lt     = item.qty * item.unitPrice;
-    grandTotal  += lt;
-    waLines += `• ${item.label}
-`;
-    waLines += `  Qty: ${item.qty} × ₹${baseP}
-`;
-    if (item.details) waLines += `  Add-ons: ${item.details}
-`;
-    waLines += `  Sub-total: *₹${lt.toLocaleString('en-IN')}*
-`;
-  });
-
-  if (preBookItems.length) {
-    waLines += `
-📋 *Pre-Book Items (price on delivery):*
-`;
-    preBookItems.forEach(([, item]) => {
-      waLines += `• ${item.label} — Qty: ${item.qty}
-`;
-    });
-  }
-
-  const hasPreBook = preBookItems.length > 0;
-  let msg  = `📦 *Pay on Delivery — TruSea Fish*
-`;
-  msg     += `Order ID: *${orderId}*
-`;
-  msg     += `${date}
-`;
-  msg     += `*${name}* | ${phone}
-`;
-  msg     += `${address}
-`;
-  if (mapLoc) msg += `🗺️ ${mapLoc}
-`;
-  msg     += `
-*Order Summary:*
-${waLines}
-`;
-  msg     += `*Order Total: ₹${grandTotal.toLocaleString('en-IN')}* (Pay on Delivery)
-`;
-  msg     += `_(Incl. GST & FREE delivery)_
-`;
-  if (hasPreBook) msg += `_Pre-book items will be charged on delivery_
-`;
-  msg     += `
-_Sent via TruSea Fresh · ${orderId}_`;
-
-  // Show confirmation in drawer
-  const statusEl = document.getElementById('submit-status');
-  if (statusEl) {
-    statusEl.innerHTML = `📦 <strong>Order placed!</strong> Order <strong>${orderId}</strong> — Pay on Delivery.`;
-    statusEl.style.color = '#fb923c';
-  }
-
-  // Update buttons
-  document.querySelectorAll('.pay-btn-row button').forEach(b => {
-    b.disabled = true;
-    b.style.opacity = '0.5';
-  });
-
-  // Open WhatsApp
-  setTimeout(() => {
-    window.open(`https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-  }, 400);
-
-  // Log to sheet — with COD flag in payment field
-  logToSheet({
-    orderId, name, phone, address, mapLoc,
-    inStockItems, preBookItems, grandTotal,
-    paymentMode: 'COD',
-  });
-
-  // Clear cart after short delay
-  setTimeout(() => {
-    cart = {};
-    updateFAB();
-    renderDrawer();
-  }, 3000);
-}
-
-/* ══ PAYU PAYMENT FLOW ══════════════ */
-
-// Step 1: Validate form → show PayU overlay
-async function initiatePayU() {
-  const items = Object.entries(cart);
-  if (!items.length) { alert('Please add items to your order first!'); return; }
-
-  const name    = document.getElementById('cust-name').value.trim();
-  const phone   = document.getElementById('cust-phone').value.trim();
-  const address = document.getElementById('cust-address').value.trim();
-
-  if (!name)    { document.getElementById('cust-name').focus();    alert('Please enter your name'); return; }
-  if (!phone)   { document.getElementById('cust-phone').focus();   alert('Please enter your phone number'); return; }
-  if (!address) { document.getElementById('cust-address').focus(); alert('Please enter your delivery address'); return; }
-
-  saveProfile();
-
-  // Calculate total (in-stock items only)
-  const inStockItems = items.filter(([, i]) => !i.preBook);
-  const grandTotal   = inStockItems.reduce((s, [, i]) => s + i.qty * i.unitPrice, 0);
-
-  if (grandTotal <= 0) {
-    alert('Only pre-book items in cart. Please contact us directly for pre-book orders.');
-    return;
-  }
-
-  // Generate order ID
-  const orderId = await genOrderId();
-
-  // Store order data for after payment
-  window._payuOrderData = {
-    orderId, name, phone, address,
-    mapLoc: document.getElementById('cust-maploc').value.trim(),
-    items, inStockItems,
-    preBookItems: items.filter(([, i]) => i.preBook),
-    grandTotal,
-  };
-
-  // Show PayU overlay
-  document.getElementById('payu-amount-display').textContent = '₹' + grandTotal.toLocaleString('en-IN');
-  document.getElementById('payu-order-display').textContent  = 'Order ID: ' + orderId;
-  document.getElementById('payu-test-banner').style.display  = CONFIG.PAYU_MODE === 'test' ? '' : 'none';
-  document.getElementById('payu-overlay').classList.add('open');
-}
-
-function closePayUOverlay() {
-  document.getElementById('payu-overlay').classList.remove('open');
-  window._payuOrderData = null;
-}
-
-// Step 2: Request hash from Apps Script → submit PayU form
-async function submitPayUForm() {
-  const d = window._payuOrderData;
-  if (!d) return;
-
-  const btn = document.getElementById('payu-pay-btn');
-  btn.textContent = '⏳ Preparing payment…';
-  btn.disabled = true;
-
-  try {
-    // Build success & failure URLs with order data encoded
-    const baseUrl  = window.location.href.split('?')[0];
-    const encoded  = encodeURIComponent(JSON.stringify({
-      orderId:    d.orderId,
-      name:       d.name,
-      phone:      d.phone,
-      address:    d.address,
-      mapLoc:     d.mapLoc,
-      grandTotal: d.grandTotal,
-    }));
-    // surl/furl MUST point to Apps Script — GitHub Pages rejects POST with 405
-    // Apps Script receives PayU POST → redirects back to GitHub Pages with ?payu=success
-    const surl = CONFIG.APPS_SCRIPT_URL + '?action=payuSuccess&redirect=' + encodeURIComponent(baseUrl) + '&data=' + encoded;
-    const furl = CONFIG.APPS_SCRIPT_URL + '?action=payuFail&redirect='    + encodeURIComponent(baseUrl) + '&data=' + encoded;
-
-    // Email fallback (PayU requires email)
-    const email = 'customer@trusea.in';
-
-    // Unique txnid every attempt — PayU rejects reused txnids
-    // orderId (TSF-0068) = display; txnid (TSF-0068-timestamp) = PayU unique key
-    const txnid = d.orderId + '-' + Date.now();
-
-    // Get hash from Apps Script (Salt stays secure on server)
-    const hashRes = await fetch(CONFIG.APPS_SCRIPT_URL + '?action=payuHash&key=' + CONFIG.PAYU_KEY +
-      '&txnid=' + txnid +
-      '&amount=' + d.grandTotal +
-      '&productinfo=' + encodeURIComponent('TruSea Fish Order') +
-      '&firstname=' + encodeURIComponent(d.name) +
-      '&email=' + encodeURIComponent(email), { mode: 'cors' });
-
-    const hashData = await hashRes.json();
-
-    if (!hashData.hash) throw new Error('Hash generation failed');
-
-    // Fill hidden form
-    const payuUrl = CONFIG.PAYU_MODE === 'test'
-      ? 'https://test.payu.in/_payment'
-      : 'https://secure.payu.in/_payment';
-
-    const form = document.getElementById('payu-form');
-    form.action = payuUrl;
-
-    document.getElementById('pf-key').value         = CONFIG.PAYU_KEY;
-    document.getElementById('pf-txnid').value       = txnid;
-    document.getElementById('pf-amount').value      = d.grandTotal;
-    document.getElementById('pf-productinfo').value = 'TruSea Fish Order';
-    document.getElementById('pf-firstname').value   = d.name;
-    document.getElementById('pf-email').value       = email;
-    document.getElementById('pf-phone').value       = d.phone;
-    document.getElementById('pf-surl').value        = surl;
-    document.getElementById('pf-furl').value        = furl;
-    document.getElementById('pf-hash').value        = hashData.hash;
-
-    // Save EVERYTHING to localStorage before leaving page
-    // Cart + customer details + order data — restored on PayU return
-    localStorage.setItem('trusea_pending_order', JSON.stringify({
-      orderId:      d.orderId,
-      name:         d.name,
-      phone:        d.phone,
-      address:      d.address,
-      mapLoc:       d.mapLoc,
-      grandTotal:   d.grandTotal,
-      inStockItems: d.inStockItems.map(([k, i]) => [k, i]),
-      preBookItems: d.preBookItems.map(([k, i]) => [k, i]),
-    }));
-
-    // Also save full cart object + customer form fields for UI restore
-    localStorage.setItem('trusea_cart_backup', JSON.stringify(cart));
-    localStorage.setItem('trusea_customer_backup', JSON.stringify({
-      name:    d.name,
-      phone:   d.phone,
-      address: d.address,
-      mapLoc:  d.mapLoc,
-    }));
-
-    form.submit(); // → PayU payment page
-
-  } catch(err) {
-    btn.textContent = '🔒 Pay Securely';
-    btn.disabled = false;
-    alert('Payment setup failed: ' + err.message + '\n\nPlease try again or contact us.');
-  }
-}
-
-// Step 3: On page load — check if returning from PayU
-function checkPayUReturn() {
-  const params = new URLSearchParams(window.location.search);
-  const status = params.get('payu');
-  if (!status) return;
-
-  // Always restore cart + customer details first (page was refreshed by PayU return)
-  _restoreCartAndCustomer();
-
-  if (status === 'success') {
-    const pending = JSON.parse(localStorage.getItem('trusea_pending_order') || 'null');
-    if (pending) {
-      localStorage.removeItem('trusea_pending_order');
-      localStorage.removeItem('trusea_cart_backup');
-      localStorage.removeItem('trusea_customer_backup');
-      // Small delay — let page fully render first
-      setTimeout(() => afterPaymentSuccess(pending), 600);
-    }
-  } else if (status === 'fail') {
-    // Payment failed — restore cart, open drawer so customer can retry
-    setTimeout(() => {
-      openDrawer();
-      const status = document.getElementById('submit-status');
-      if (status) {
-        status.textContent = '❌ Payment was not completed. Please try again.';
-        status.style.color = '#f87171';
-      }
-    }, 400);
-  }
-
-  // Clean URL
-  window.history.replaceState({}, '', window.location.pathname);
-}
-
-// Restore cart + customer details from localStorage backup
-function _restoreCartAndCustomer() {
-  try {
-    // Restore cart
-    const cartBackup = localStorage.getItem('trusea_cart_backup');
-    if (cartBackup) {
-      cart = JSON.parse(cartBackup);
-      updateFAB();
-    }
-
-    // Restore customer form fields
-    const custBackup = localStorage.getItem('trusea_customer_backup');
-    if (custBackup) {
-      const c = JSON.parse(custBackup);
-      const nameEl    = document.getElementById('cust-name');
-      const phoneEl   = document.getElementById('cust-phone');
-      const addressEl = document.getElementById('cust-address');
-      const mapEl     = document.getElementById('cust-maploc');
-      if (nameEl    && c.name)    nameEl.value    = c.name;
-      if (phoneEl   && c.phone)   phoneEl.value   = c.phone;
-      if (addressEl && c.address) addressEl.value = c.address;
-      if (mapEl     && c.mapLoc)  mapEl.value     = c.mapLoc;
-    }
-  } catch(e) {
-    console.warn('Cart restore failed:', e);
-  }
-}
-
-// Step 4: After successful payment → WhatsApp + Sheet log
-async function afterPaymentSuccess(d) {
-  const inStockItems  = d.inStockItems  || [];
-  const preBookItems  = d.preBookItems  || [];
-  const grandTotal    = d.grandTotal;
-  const orderId       = d.orderId;
-  const date          = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
-
-  let waLines = '';
-  inStockItems.forEach(([, item]) => {
-    const baseP = item.basePrice || item.unitPrice;
-    const lt    = item.qty * item.unitPrice;
-    waLines += `• ${item.label}
-`;
-    waLines += `  Qty: ${item.qty} × ₹${baseP}
-`;
-    if (item.details) waLines += `  Add-ons: ${item.details}
-`;
-    waLines += `  Sub-total: *₹${lt.toLocaleString('en-IN')}*
-`;
-  });
-
-  if (preBookItems.length) {
-    waLines += `
-📋 *Pre-Book Items (price on delivery):*
-`;
-    preBookItems.forEach(([, item]) => {
-      waLines += `• ${item.label} — Qty: ${item.qty}
-`;
-    });
-  }
-
-  const hasPreBook = preBookItems.length > 0;
-  let msg  = `✅ *Payment Confirmed — TruSea Fish*
-`;
-  msg     += `Order ID: *${orderId}*
-`;
-  msg     += `${date}
-`;
-  msg     += `*${d.name}* | ${d.phone}
-`;
-  msg     += `${d.address}
-`;
-  if (d.mapLoc) msg += `🗺️ ${d.mapLoc}
-`;
-  msg     += `
-*Order Summary:*
-${waLines}
-`;
-  msg     += `*Amount Paid: ₹${grandTotal.toLocaleString('en-IN')}* ✅
-`;
-  msg     += `_(Incl. GST & FREE delivery)_
-`;
-  if (hasPreBook) msg += `_Pre-book items will be charged on delivery_
-`;
-  msg     += `
-_Sent via TruSea Fresh · ${orderId}_`;
-
-  // Log to sheet first (background)
-  logToSheet({ orderId, name: d.name, phone: d.phone, address: d.address,
-    mapLoc: d.mapLoc, inStockItems, preBookItems, grandTotal });
-
-  // Open drawer with success message
-  openDrawer();
-  const statusEl = document.getElementById('submit-status');
-  if (statusEl) {
-    statusEl.innerHTML = `✅ <strong>Payment confirmed!</strong> Order <strong>${orderId}</strong> placed successfully.`;
-    statusEl.style.color = '#4ade80';
-  }
-
-  // Show drawer footer success state
-  const payBtn = document.querySelector('.wa-btn');
-  if (payBtn) {
-    payBtn.textContent = '✅ Order Confirmed — Opening WhatsApp…';
-    payBtn.style.background = 'linear-gradient(135deg,#4ade80,#16a34a)';
-    payBtn.disabled = true;
-  }
-
-  // Auto-open WhatsApp after short delay (let customer see confirmation first)
-  setTimeout(() => {
-    window.open(`https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-  }, 1200);
-
-  // Clear cart after success
-  setTimeout(() => {
-    cart = {};
-    updateFAB();
-    renderDrawer();
-  }, 3000);
-}
-
 /* ══ WHATSAPP + SHEET LOG ═══════════ */
 async function sendWA() {
   const items = Object.entries(cart);
@@ -2670,7 +2133,7 @@ async function sendWA() {
   logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal });
 }
 
-async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal, paymentMode }) {
+async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal }) {
   if (CONFIG.APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
 
   const status = document.getElementById('submit-status');
@@ -2705,13 +2168,12 @@ async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems,
     timestamp,
     orderId,
     name, phone, address,
-    mapLink:     mapLoc || '',
-    product:     inStockNames,
-    addons:      addonsAll || '',
-    preBook:     preBookNames || '',
-    price:       priceBreakdown,
-    orderTotal:  grandTotal,
-    paymentMode: paymentMode || 'Online', // 'Online' or 'COD'
+    mapLink:    mapLoc || '',
+    product:    inStockNames,
+    addons:     addonsAll || '',
+    preBook:    preBookNames || '',
+    price:      priceBreakdown,
+    orderTotal: grandTotal,
   };
 
   try {
@@ -3053,7 +2515,6 @@ function onFishChipClick(fishName) {
 /* ══ INIT ═══════════════════════════ */
 /* ══ INIT ═══════════════════════════ */
 load();
-checkPayUReturn();
 setInterval(load, 15 * 60 * 1000); // refresh every 15 min
 </script>
 </body>

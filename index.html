@@ -654,6 +654,36 @@ header {
   transition: all 0.18s;
 }
 .wa-btn:hover { background: #1db954; }
+
+/* Payment buttons row */
+.pay-btn-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 0;
+}
+.pay-btn-row .wa-btn { margin: 0; box-shadow: none; }
+.cod-btn {
+  width: 100%;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px solid rgba(255,255,255,0.15);
+  color: var(--text);
+  padding: 14px;
+  border-radius: 13px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  transition: all 0.18s;
+}
+.cod-btn:hover {
+  background: rgba(255,255,255,0.12);
+  border-color: rgba(255,255,255,0.3);
+}
 .wa-icon { width: 20px; height: 20px; fill: #fff; flex-shrink: 0; }
 
 .addr-field {
@@ -1262,9 +1292,14 @@ header {
       <span class="total-label">Estimated Total</span>
       <span class="total-val" id="total-val">₹0</span>
     </div>
-    <button class="wa-btn" onclick="initiatePayU()" style="background:linear-gradient(135deg,#2dd4b0,#1aa38d);color:#0a1628;">
-      🔒 Pay & Confirm Order
-    </button>
+    <div class="pay-btn-row">
+      <button class="wa-btn" onclick="initiatePayU()" style="background:linear-gradient(135deg,#2dd4b0,#1aa38d);color:#0a1628;font-size:13px;">
+        🔒 Pay Now
+      </button>
+      <button class="cod-btn" onclick="placeCOD()">
+        📦 Pay on Delivery
+      </button>
+    </div>
   </div>
 </div>
 
@@ -2170,6 +2205,113 @@ function loadProfile() {
   } catch(e) {}
 }
 
+/* ══ COD — Pay on Delivery ══════════ */
+async function placeCOD() {
+  const items = Object.entries(cart);
+  if (!items.length) { alert('Please add items to your order first!'); return; }
+
+  const name    = document.getElementById('cust-name').value.trim();
+  const phone   = document.getElementById('cust-phone').value.trim();
+  const address = document.getElementById('cust-address').value.trim();
+  const mapLoc  = document.getElementById('cust-maploc').value.trim();
+
+  if (!name)    { document.getElementById('cust-name').focus();    alert('Please enter your name'); return; }
+  if (!phone)   { document.getElementById('cust-phone').focus();   alert('Please enter your phone number'); return; }
+  if (!address) { document.getElementById('cust-address').focus(); alert('Please enter your delivery address'); return; }
+
+  saveProfile();
+
+  const orderId       = await genOrderId();
+  const date          = new Date().toLocaleDateString('en-IN', {day:'numeric', month:'short', year:'numeric'});
+  const inStockItems  = items.filter(([, i]) => !i.preBook);
+  const preBookItems  = items.filter(([, i]) =>  i.preBook);
+
+  let grandTotal = 0;
+  let waLines    = '';
+
+  inStockItems.forEach(([, item]) => {
+    const baseP  = item.basePrice || item.unitPrice;
+    const lt     = item.qty * item.unitPrice;
+    grandTotal  += lt;
+    waLines += `• ${item.label}
+`;
+    waLines += `  Qty: ${item.qty} × ₹${baseP}
+`;
+    if (item.details) waLines += `  Add-ons: ${item.details}
+`;
+    waLines += `  Sub-total: *₹${lt.toLocaleString('en-IN')}*
+`;
+  });
+
+  if (preBookItems.length) {
+    waLines += `
+📋 *Pre-Book Items (price on delivery):*
+`;
+    preBookItems.forEach(([, item]) => {
+      waLines += `• ${item.label} — Qty: ${item.qty}
+`;
+    });
+  }
+
+  const hasPreBook = preBookItems.length > 0;
+  let msg  = `📦 *Pay on Delivery — TruSea Fish*
+`;
+  msg     += `Order ID: *${orderId}*
+`;
+  msg     += `${date}
+`;
+  msg     += `*${name}* | ${phone}
+`;
+  msg     += `${address}
+`;
+  if (mapLoc) msg += `🗺️ ${mapLoc}
+`;
+  msg     += `
+*Order Summary:*
+${waLines}
+`;
+  msg     += `*Order Total: ₹${grandTotal.toLocaleString('en-IN')}* (Pay on Delivery)
+`;
+  msg     += `_(Incl. GST & FREE delivery)_
+`;
+  if (hasPreBook) msg += `_Pre-book items will be charged on delivery_
+`;
+  msg     += `
+_Sent via TruSea Fresh · ${orderId}_`;
+
+  // Show confirmation in drawer
+  const statusEl = document.getElementById('submit-status');
+  if (statusEl) {
+    statusEl.innerHTML = `📦 <strong>Order placed!</strong> Order <strong>${orderId}</strong> — Pay on Delivery.`;
+    statusEl.style.color = '#fb923c';
+  }
+
+  // Update buttons
+  document.querySelectorAll('.pay-btn-row button').forEach(b => {
+    b.disabled = true;
+    b.style.opacity = '0.5';
+  });
+
+  // Open WhatsApp
+  setTimeout(() => {
+    window.open(`https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+  }, 400);
+
+  // Log to sheet — with COD flag in payment field
+  logToSheet({
+    orderId, name, phone, address, mapLoc,
+    inStockItems, preBookItems, grandTotal,
+    paymentMode: 'COD',
+  });
+
+  // Clear cart after short delay
+  setTimeout(() => {
+    cart = {};
+    updateFAB();
+    renderDrawer();
+  }, 3000);
+}
+
 /* ══ PAYU PAYMENT FLOW ══════════════ */
 
 // Step 1: Validate form → show PayU overlay
@@ -2277,7 +2419,8 @@ async function submitPayUForm() {
     document.getElementById('pf-furl').value        = furl;
     document.getElementById('pf-hash').value        = hashData.hash;
 
-    // Save order data to localStorage before leaving page
+    // Save EVERYTHING to localStorage before leaving page
+    // Cart + customer details + order data — restored on PayU return
     localStorage.setItem('trusea_pending_order', JSON.stringify({
       orderId:      d.orderId,
       name:         d.name,
@@ -2287,6 +2430,15 @@ async function submitPayUForm() {
       grandTotal:   d.grandTotal,
       inStockItems: d.inStockItems.map(([k, i]) => [k, i]),
       preBookItems: d.preBookItems.map(([k, i]) => [k, i]),
+    }));
+
+    // Also save full cart object + customer form fields for UI restore
+    localStorage.setItem('trusea_cart_backup', JSON.stringify(cart));
+    localStorage.setItem('trusea_customer_backup', JSON.stringify({
+      name:    d.name,
+      phone:   d.phone,
+      address: d.address,
+      mapLoc:  d.mapLoc,
     }));
 
     form.submit(); // → PayU payment page
@@ -2304,21 +2456,60 @@ function checkPayUReturn() {
   const status = params.get('payu');
   if (!status) return;
 
+  // Always restore cart + customer details first (page was refreshed by PayU return)
+  _restoreCartAndCustomer();
+
   if (status === 'success') {
     const pending = JSON.parse(localStorage.getItem('trusea_pending_order') || 'null');
     if (pending) {
       localStorage.removeItem('trusea_pending_order');
-      // Send WhatsApp + log to sheet
-      afterPaymentSuccess(pending);
+      localStorage.removeItem('trusea_cart_backup');
+      localStorage.removeItem('trusea_customer_backup');
+      // Small delay — let page fully render first
+      setTimeout(() => afterPaymentSuccess(pending), 600);
     }
   } else if (status === 'fail') {
+    // Payment failed — restore cart, open drawer so customer can retry
     setTimeout(() => {
-      alert('❌ Payment was not completed. Your cart is still saved — please try again.');
-    }, 500);
+      openDrawer();
+      const status = document.getElementById('submit-status');
+      if (status) {
+        status.textContent = '❌ Payment was not completed. Please try again.';
+        status.style.color = '#f87171';
+      }
+    }, 400);
   }
 
   // Clean URL
   window.history.replaceState({}, '', window.location.pathname);
+}
+
+// Restore cart + customer details from localStorage backup
+function _restoreCartAndCustomer() {
+  try {
+    // Restore cart
+    const cartBackup = localStorage.getItem('trusea_cart_backup');
+    if (cartBackup) {
+      cart = JSON.parse(cartBackup);
+      updateFAB();
+    }
+
+    // Restore customer form fields
+    const custBackup = localStorage.getItem('trusea_customer_backup');
+    if (custBackup) {
+      const c = JSON.parse(custBackup);
+      const nameEl    = document.getElementById('cust-name');
+      const phoneEl   = document.getElementById('cust-phone');
+      const addressEl = document.getElementById('cust-address');
+      const mapEl     = document.getElementById('cust-maploc');
+      if (nameEl    && c.name)    nameEl.value    = c.name;
+      if (phoneEl   && c.phone)   phoneEl.value   = c.phone;
+      if (addressEl && c.address) addressEl.value = c.address;
+      if (mapEl     && c.mapLoc)  mapEl.value     = c.mapLoc;
+    }
+  } catch(e) {
+    console.warn('Cart restore failed:', e);
+  }
 }
 
 // Step 4: After successful payment → WhatsApp + Sheet log
@@ -2379,19 +2570,37 @@ ${waLines}
   msg     += `
 _Sent via TruSea Fresh · ${orderId}_`;
 
-  // Open WhatsApp
-  window.open(`https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-
-  // Log to sheet
+  // Log to sheet first (background)
   logToSheet({ orderId, name: d.name, phone: d.phone, address: d.address,
     mapLoc: d.mapLoc, inStockItems, preBookItems, grandTotal });
 
-  // Show success UI
-  setTimeout(() => {
-    alert(`✅ Payment successful! Order ${orderId} confirmed.
+  // Open drawer with success message
+  openDrawer();
+  const statusEl = document.getElementById('submit-status');
+  if (statusEl) {
+    statusEl.innerHTML = `✅ <strong>Payment confirmed!</strong> Order <strong>${orderId}</strong> placed successfully.`;
+    statusEl.style.color = '#4ade80';
+  }
 
-WhatsApp opened with your order details.`);
-  }, 500);
+  // Show drawer footer success state
+  const payBtn = document.querySelector('.wa-btn');
+  if (payBtn) {
+    payBtn.textContent = '✅ Order Confirmed — Opening WhatsApp…';
+    payBtn.style.background = 'linear-gradient(135deg,#4ade80,#16a34a)';
+    payBtn.disabled = true;
+  }
+
+  // Auto-open WhatsApp after short delay (let customer see confirmation first)
+  setTimeout(() => {
+    window.open(`https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
+  }, 1200);
+
+  // Clear cart after success
+  setTimeout(() => {
+    cart = {};
+    updateFAB();
+    renderDrawer();
+  }, 3000);
 }
 
 /* ══ WHATSAPP + SHEET LOG ═══════════ */
@@ -2455,7 +2664,7 @@ async function sendWA() {
   logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal });
 }
 
-async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal }) {
+async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal, paymentMode }) {
   if (CONFIG.APPS_SCRIPT_URL === 'YOUR_APPS_SCRIPT_URL_HERE') return;
 
   const status = document.getElementById('submit-status');
@@ -2490,12 +2699,13 @@ async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems,
     timestamp,
     orderId,
     name, phone, address,
-    mapLink:    mapLoc || '',
-    product:    inStockNames,
-    addons:     addonsAll || '',
-    preBook:    preBookNames || '',
-    price:      priceBreakdown,
-    orderTotal: grandTotal,
+    mapLink:     mapLoc || '',
+    product:     inStockNames,
+    addons:      addonsAll || '',
+    preBook:     preBookNames || '',
+    price:       priceBreakdown,
+    orderTotal:  grandTotal,
+    paymentMode: paymentMode || 'Online', // 'Online' or 'COD'
   };
 
   try {

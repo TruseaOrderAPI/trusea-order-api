@@ -1226,6 +1226,7 @@ header {
       <span class="total-label">Estimated Total</span>
       <span class="total-val" id="total-val">₹0</span>
     </div>
+    <div id="delivery-charge-row" style="display:flex;justify-content:space-between;align-items:center;margin:-6px 0 12px;min-height:20px;"></div>
     <div class="pay-btn-row">
       <button class="wa-btn" onclick="sendWA()">
         💳 Pay via UPI
@@ -2035,8 +2036,30 @@ function renderDrawer() {
     }
   }).join('');
 
-  document.getElementById('total-val').textContent =
-    '₹' + grandTotal.toLocaleString('en-IN');
+  // Delivery charge logic: <800 → ₹40, >=800 → FREE
+  const DELIVERY_THRESHOLD = 800;
+  const DELIVERY_CHARGE    = 40;
+  const deliveryFee   = grandTotal > 0 && grandTotal < DELIVERY_THRESHOLD ? DELIVERY_CHARGE : 0;
+  const finalTotal    = grandTotal + deliveryFee;
+
+  // Update total display
+  document.getElementById('total-val').textContent = '₹' + finalTotal.toLocaleString('en-IN');
+
+  // Show delivery row
+  const deliveryRowEl = document.getElementById('delivery-charge-row');
+  if (deliveryRowEl) {
+    if (grandTotal === 0) {
+      deliveryRowEl.innerHTML = '';
+    } else if (deliveryFee > 0) {
+      deliveryRowEl.innerHTML = `
+        <span style="color:var(--text2);font-size:12px;">🛵 Delivery charge</span>
+        <span style="color:#f87171;font-size:13px;font-weight:700;">+₹${DELIVERY_CHARGE}</span>`;
+    } else {
+      deliveryRowEl.innerHTML = `
+        <span style="color:#4ade80;font-size:12px;font-weight:600;">🎉 You're eligible for FREE delivery!</span>
+        <span style="color:#4ade80;font-size:13px;font-weight:700;">FREE</span>`;
+    }
+  }
 }
 
 /* ══ GEOLOCATION ════════════════════ */
@@ -2137,6 +2160,10 @@ async function sendWA() {
     waLines += `  Sub-total: *₹${lt.toLocaleString('en-IN')}*\n`;
   });
 
+  // Delivery charge
+  const deliveryFee  = grandTotal > 0 && grandTotal < 800 ? 40 : 0;
+  const finalTotal   = grandTotal + deliveryFee;
+
   if (preBookItems.length) {
     waLines += `\n📋 *Pre-Book Items (price on delivery):*\n`;
     preBookItems.forEach(([, item]) => {
@@ -2152,14 +2179,21 @@ async function sendWA() {
   msg     += `${address}\n`;
   if (mapLoc) msg += `🗺️ ${mapLoc}\n`;
   msg     += `\n*Order Summary:*\n${waLines}\n`;
-  msg     += `*Order Total: ₹${grandTotal.toLocaleString('en-IN')}*\n`;
-  msg     += `_(Incl. GST & FREE delivery)_\n`;
+  msg     += `Items Total: ₹${grandTotal.toLocaleString('en-IN')}\n`;
+  if (deliveryFee > 0) {
+    msg   += `🛵 Delivery Charge: *₹${deliveryFee}*\n`;
+    msg   += `*Order Total: ₹${finalTotal.toLocaleString('en-IN')}*\n`;
+  } else {
+    msg   += `🎉 Delivery: *FREE*\n`;
+    msg   += `*Order Total: ₹${finalTotal.toLocaleString('en-IN')}*\n`;
+  }
+  msg     += `_(Incl. GST)_\n`;
   if (hasPreBook) msg += `_Pre-book items will be charged on delivery_\n`;
   msg     += `\n_Sent via TruSea Fresh · ${orderId}_`;
 
   // UPI Payment details
-  if (grandTotal > 0) {
-    msg += `\n\n💳 *To Pay ₹${grandTotal.toLocaleString('en-IN')}:*`;
+  if (finalTotal > 0) {
+    msg += `\n\n💳 *To Pay ₹${finalTotal.toLocaleString('en-IN')}:*`;
     msg += `\nUPI ID: *9167200810@pthdfc*`;
     msg += `\n_(Pay using any UPI app — GPay, PhonePe, Paytm, BHIM)_`;
     msg += `\n\n📷 *Scan QR Code to Pay:*`;
@@ -2167,7 +2201,7 @@ async function sendWA() {
   }
 
   window.open(`https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-  logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal });
+  logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal: finalTotal });
 }
 
 async function sendCOD() {
@@ -2194,15 +2228,29 @@ async function sendCOD() {
     if (item.details) waLines += `  Add-ons: ${item.details}\n`;
     waLines += `  Sub-total: *₹${lt.toLocaleString('en-IN')}*\n`;
   });
+
+  // Delivery charge
+  const deliveryFee = grandTotal > 0 && grandTotal < 800 ? 40 : 0;
+  const finalTotal  = grandTotal + deliveryFee;
+
   if (preBookItems.length) {
     waLines += `\n📋 *Pre-Book Items (price on delivery):*\n`;
     preBookItems.forEach(([, item]) => { waLines += `• ${item.label} — Qty: ${item.qty}\n`; });
   }
   let msg = `📦 *TruSea Fish — Pay on Delivery*\nOrder ID: *${orderId}*\n${date}\n*${name}* | ${phone}\n${address}\n`;
   if (mapLoc) msg += `🗺️ ${mapLoc}\n`;
-  msg += `\n*Order Summary:*\n${waLines}\n*Order Total: ₹${grandTotal.toLocaleString('en-IN')}* (Pay on Delivery)\n_(Incl. GST & FREE delivery)_\n_Sent via TruSea Fresh · ${orderId}_`;
+  msg += `\n*Order Summary:*\n${waLines}\n`;
+  msg += `Items Total: ₹${grandTotal.toLocaleString('en-IN')}\n`;
+  if (deliveryFee > 0) {
+    msg += `🛵 Delivery Charge: *₹${deliveryFee}*\n`;
+    msg += `*Order Total: ₹${finalTotal.toLocaleString('en-IN')}* (Pay on Delivery)\n`;
+  } else {
+    msg += `🎉 Delivery: *FREE*\n`;
+    msg += `*Order Total: ₹${finalTotal.toLocaleString('en-IN')}* (Pay on Delivery)\n`;
+  }
+  msg += `_(Incl. GST)_\n_Sent via TruSea Fresh · ${orderId}_`;
   window.open(`https://wa.me/${CONFIG.WA_NUMBER}?text=${encodeURIComponent(msg)}`, '_blank');
-  logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal });
+  logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal: finalTotal });
 }
 
 async function logToSheet({ orderId, name, phone, address, mapLoc, inStockItems, preBookItems, grandTotal }) {
